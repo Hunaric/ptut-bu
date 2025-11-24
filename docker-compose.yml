@@ -11,13 +11,46 @@ services:
       - /app/node_modules
     command: ["npm", "run", "start", "--", "--host", "0.0.0.0"]
 
-  # backend:
-  #   build:
-  #     context: ./back
-  #     dockerfile: Dockerfile.dev
-  #   container_name: ptut_back
-  #   ports:
-  #     - "8000:8000"
-  #   volumes:
-  #     - ./back:/app
-  #   command: ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
+  backend:
+    build:
+      context: ./back
+      dockerfile: Dockerfile.dev
+    container_name: ptut_back
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./back:/app
+    environment:
+      - POSTGRES_USER=ptut_user
+      - POSTGRES_PASSWORD=ptut_pass
+      - POSTGRES_DB=ptut_db
+      - DATABASE_URL=postgresql+psycopg2://ptut_user:ptut_pass@db:5432/ptut_db
+    depends_on:
+      - db
+    command: ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
+
+  db:
+    image: postgres:16
+    container_name: ptut_db
+    environment:
+      POSTGRES_USER: ptut_user
+      POSTGRES_PASSWORD: ptut_pass
+      POSTGRES_DB: ptut_db
+    ports:
+      - "5433:5432"  # <-- port modifié pour éviter conflit
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:7
+    container_name: ptut_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@ptut.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+volumes:
+  db_data:
