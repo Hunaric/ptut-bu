@@ -2,4 +2,10 @@
 ---
 ## Frontend
 Nous utilisons Angular pour son coté modulaire.
-Pour l'affichage des graphes, nous avons installé le module Kendo UI
+Modules installe avec npm:
+- swiper
+- @fullcalendar/timegrid
+- @fullcalendar/core   
+- @fullcalendar/angular   
+- @fullcalendar/daygrid   
+- @fullcalendar/interaction
