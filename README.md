@@ -11,3 +11,6 @@ Modules installe avec npm:
 - @fullcalendar/interaction
 - apexcharts
 - ng-apexcharts
+
+Commande pour installer les dependances Docker de l'appli
+`docker run -it --rm -p 4200:4200 -v $(pwd):/app angular-front`

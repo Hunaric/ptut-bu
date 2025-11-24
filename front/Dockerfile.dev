@@ -1,16 +1,13 @@
-FROM node:20-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
-# Copier seulement les fichiers de dépendances (optimisation)
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --legacy-peer-deps
 
-# Copier le reste du projet après install
 COPY . .
 
 EXPOSE 4200
 
-# Serve Angular en mode DEV avec live reload
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start", "--", "--host", "0.0.0.0"]
