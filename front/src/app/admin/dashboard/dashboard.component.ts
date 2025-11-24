@@ -10,7 +10,7 @@ import { MetricsComponent } from '../../shared/components/graphics/metrics/metri
   imports: [
     MonthlyChartComponent,
     MonthlyTargetComponent,
-    MetricsComponent
+    MetricsComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
