@@ -9,3 +9,4 @@ Modules installe avec npm:
 - @fullcalendar/angular   
 - @fullcalendar/daygrid   
 - @fullcalendar/interaction
+- apexcharts

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { AppLayoutComponent } from './shared/layout/app-layout/app-layout.component';
 import { DashboardComponent } from './admin/dashboard/dashboard.component';
+import { CalenderComponent } from './pages/calender/calender.component';
 
 export const routes: Routes = [
     // Page d'accueil
@@ -12,7 +13,13 @@ export const routes: Routes = [
                 path: '',
                 component: DashboardComponent,
                 pathMatch: 'full',
-                title: 'Dashboard'
+                title: 'Dashboard',
+                    
+            },
+            {
+                path:'calendar',
+                component:CalenderComponent,
+                title:'Angular Calender | TailAdmin - Angular Admin Dashboard Template'
             },
             
         ],
