@@ -1,0 +1,16 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copier seulement les fichiers de dépendances (optimisation)
+COPY package*.json ./
+
+RUN npm install
+
+# Copier le reste du projet après install
+COPY . .
+
+EXPOSE 4200
+
+# Serve Angular en mode DEV avec live reload
+CMD ["npm", "run", "start"]
