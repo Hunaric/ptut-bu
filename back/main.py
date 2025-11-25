@@ -1,10 +1,14 @@
 from fastapi import FastAPI
+from app.api.v1 import book
+from app.core.database import Base, engine
 
-app = FastAPI(title="API Ptut")
+# Crée les tables si elles n'existent pas
+Base.metadata.create_all(bind=engine)
 
-@app.get("/")
-async def root():
-    return {"message": "Hello from FastAPI!"}
+app = FastAPI(title="Bibliotheque Universitaire")
+
+# Routes
+app.include_router(book.router, prefix="/books", tags=["Books"])
 
 @app.get("/books")
 async def get_books():
