@@ -3,3 +3,11 @@ uvicorn[standard]==0.38.0
 python-dotenv==1.2.1
 psycopg2-binary==2.9.11
 SQLAlchemy==2.0.44
+python-jose==3.5.0
+pydantic==2.12.4
+passlib[bcrypt]
+pydantic[email]
+alembic==1.17.2
+bcrypt==5.0.0
+python-multipart==0.0.20
+fastapi-mail==1.5.8
