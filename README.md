@@ -21,12 +21,10 @@ et pour l'arreter:
 `docker compose down`
 
 A faire:
-- Barre du header
 - Page de profil
 - Page de mot de passe 
 - FAQ
 - Accueil pour personnes non loge avec ses quelques pages
-- Page de connexion et d'inscription
 
 
 
