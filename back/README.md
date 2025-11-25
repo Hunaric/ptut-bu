@@ -11,17 +11,29 @@ back/
      │    ├── __init__.py
      │    ├── config.py    # variables d'environnement, settings
      │    ├── security.py
-     |    └── database.py  # connexion à la DB (SQLAlchemy)
+     │    └── database.py  # connexion à la DB (SQLAlchemy)
      ├── models/           # SQLAlchemy
      │    ├── __init__.py
-     │    └── book.py
+     │    ├── book.py
+     ├    ├── person.py
+     │    ├── user.py
+     │    └──
      ├── schemas/          # Pydantic pour validation
      │    ├── __init__.py
-     │    └── book.py
+     │    ├── book.py
+     ├    ├── person.py
+     │    ├── user.py
+     │    └──
      ├── crud/             # Logique métier
      │    ├── __init__.py
-     │    └── book.py
+     │    ├── book.py
+     ├    ├── person.py
+     │    ├── user.py
+     │    └──
      └── api/              # Routes FastAPI
           └── v1/
                ├── __init__.py
-               └── book.py
+               ├── book.py
+               ├── person.py
+               ├── user.py
+               └──

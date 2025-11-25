@@ -14,3 +14,8 @@ Modules installe avec npm:
 
 Commande pour installer les dependances Docker de l'appli
 `docker run -it --rm -p 4200:4200 -v $(pwd):/app angular-front`
+
+Pour demarrer le projet avec Docker
+`docker compose up --build`
+et pour l'arreter:
+`docker compose down`
