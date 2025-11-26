@@ -35,36 +35,30 @@ A faire:
 
  docker exec -it ptut_back alembic upgrade head
 
+## Pour executer postgre depuis le shell
 
-Dans pgAdmin, ou via Docker :
-
+```shell
 docker exec -it ptut_db psql -U ptut_user -d ptut_db
-
+```
 
 Puis dans psql :
 
+```sql 
 SELECT * FROM users;
+```
 
 
-Tu verras les utilisateurs déjà présents.
-
-Supprimer un ancien utilisateur si tu veux recommencer
-
-DELETE FROM users WHERE email_etablissement = 'user@example.com';
-
-
-Réessayer la requête POST avec FastAPI.
-
-💡 Astuce : si tu veux recommencer complètement et vider la base, tu peux supprimer le volume Docker :
-
+Attention: la commande suivant est utilisee pour supprimer l ancienne base de donnees
+```shell
 docker-compose down -v
 docker-compose up -d
-
+```
 
 Ça réinitialise ptut_db et toutes les données disparaissent, tu pourras recréer tes utilisateurs sans conflit.
 
-Dans pgAdmin :
+Dans pgAdmin avec le localhost:5050:
 
+```
 Clique sur Add New Server.
 
 Onglet General : mets un nom (ex. PTUT_DB).
@@ -82,6 +76,7 @@ Username: ptut_user
 Password: ptut_pass
 
 Clique Save.
+```
 
 3️⃣ Explorer les données
 
