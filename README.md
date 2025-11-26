@@ -32,3 +32,61 @@ A faire:
  ps aux | grep uvicorn
 
  pkill -f uvicorn
+
+ docker exec -it ptut_back alembic upgrade head
+
+
+Dans pgAdmin, ou via Docker :
+
+docker exec -it ptut_db psql -U ptut_user -d ptut_db
+
+
+Puis dans psql :
+
+SELECT * FROM users;
+
+
+Tu verras les utilisateurs déjà présents.
+
+Supprimer un ancien utilisateur si tu veux recommencer
+
+DELETE FROM users WHERE email_etablissement = 'user@example.com';
+
+
+Réessayer la requête POST avec FastAPI.
+
+💡 Astuce : si tu veux recommencer complètement et vider la base, tu peux supprimer le volume Docker :
+
+docker-compose down -v
+docker-compose up -d
+
+
+Ça réinitialise ptut_db et toutes les données disparaissent, tu pourras recréer tes utilisateurs sans conflit.
+
+Dans pgAdmin :
+
+Clique sur Add New Server.
+
+Onglet General : mets un nom (ex. PTUT_DB).
+
+Onglet Connection :
+
+Host name/address: db (ou localhost si tu utilises le port 5433 exposé)
+
+Port: 5432 (dans le conteneur) ou 5433 (si tu veux passer par le port mappé)
+
+Database: ptut_db
+
+Username: ptut_user
+
+Password: ptut_pass
+
+Clique Save.
+
+3️⃣ Explorer les données
+
+Clique sur ton serveur → Databases → ptut_db → Schemas → public → Tables.
+
+Clique sur la table users → View/Edit Data → All Rows.
+
+Là tu verras tous les utilisateurs que tu as créés.

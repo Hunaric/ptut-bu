@@ -16,6 +16,8 @@ back/
      │    ├── __init__.py
      │    ├── book.py
      ├    ├── person.py
+     ├    ├── permission.py
+     ├    ├── role.py
      │    ├── user.py
      │    └──
      ├── schemas/          # Pydantic pour validation
