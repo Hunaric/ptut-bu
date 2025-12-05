@@ -1,23 +1,26 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import Optional
+from .account import Account, AccountCreate
 
 class UserBase(BaseModel):
-    email_etablissement: EmailStr
+    email: str
     username: str
-    role_id: Optional[int] = None   # rend le champ optionnel
-    person_id: Optional[int] = None
+    is_active: bool = True
+    is_superuser: bool = False
 
 class UserCreate(UserBase):
-    password: str
+    hashed_password: str
+    account: AccountCreate
 
-    model_config = {
-        "from_attributes": True
-    }
+class UserUpdate(BaseModel):
+    email: Optional[str] = None
+    username: Optional[str] = None
+    hashed_password: Optional[str] = None
 
 class User(UserBase):
     id: int
-    is_active: bool
-    
+    account: Optional[Account] = None
+
     class Config:
         from_attributes = True
-
+        
