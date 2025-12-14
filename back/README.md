@@ -15,7 +15,7 @@ back/
      ├── models/           # SQLAlchemy
      │    ├── __init__.py
      │    ├── book.py
-     ├    ├── person.py
+     ├    ├── account.py
      ├    ├── permission.py
      ├    ├── role.py
      │    ├── user.py
@@ -23,19 +23,19 @@ back/
      ├── schemas/          # Pydantic pour validation
      │    ├── __init__.py
      │    ├── book.py
-     ├    ├── person.py
+     ├    ├── account.py
      │    ├── user.py
      │    └──
      ├── crud/             # Logique métier
      │    ├── __init__.py
      │    ├── book.py
-     ├    ├── person.py
+     ├    ├── account.py
      │    ├── user.py
      │    └──
      └── api/              # Routes FastAPI
           └── v1/
                ├── __init__.py
                ├── book.py
-               ├── person.py
+               ├── account.py
                ├── user.py
                └──
