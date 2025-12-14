@@ -85,3 +85,5 @@ Clique sur ton serveur → Databases → ptut_db → Schemas → public → Tabl
 Clique sur la table users → View/Edit Data → All Rows.
 
 Là tu verras tous les utilisateurs que tu as créés.
+
+Un autre pull request a ete inite ce 14/12/2025
