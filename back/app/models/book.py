@@ -15,7 +15,6 @@ class Book(Base):
 
     # Relation vers Category
     category = relationship("Category", back_populates="books")
-    # Relation vers BorrowRecord
+    # Relation vers BorrowRecord        
     # borrow_records = relationship("BorrowRecord", back_populates="book")    
     loans = relationship("Loan", back_populates="book")
-

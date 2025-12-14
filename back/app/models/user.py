@@ -23,4 +23,4 @@ class User(Base):
     account_id = Column(UUID(as_uuid=True), ForeignKey("accounts.id"), nullable=True)
     account = relationship("Account", back_populates="user")
 
-    loans = relationship("Loan", back_populates="book")
+    loans = relationship("Loan", back_populates="user")
