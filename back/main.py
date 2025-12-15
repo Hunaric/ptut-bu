@@ -5,6 +5,14 @@ from app.core.database import Base, engine
 from app.models.user import User
 from app.models.role import Role
 from app.models.account import Account
+from app.models.permission import Permission    
+from app.models.category import Category
+from app.models.book import Book
+from app.models.tag import Tag
+from app.models.book_tag import book_tag
+from app.models.loan import Loan
+# from app.models.role_permission import RolePermission
+
 
 # Crée les tables si elles n'existent pas
 Base.metadata.create_all(bind=engine)

@@ -9,7 +9,6 @@ class UserBase(BaseModel):
     is_superuser: bool = False
 
 class UserCreate(UserBase):
-    hashed_password: str
     account: AccountCreate
 
 class UserUpdate(BaseModel):

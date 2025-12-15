@@ -1,3 +1,4 @@
+from operator import or_
 from sqlalchemy.orm import Session
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
@@ -35,5 +36,19 @@ def update_user(db: Session, db_user: User, updates: UserUpdate):
 
 def get_user(db: Session, user_id: int):
     return db.query(User).filter(User.id == user_id).first()
+
 def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()
+
+
+def get_user_by_identifier(db: Session, identifier: str):
+    return (
+        db.query(User)
+        .filter(
+            or_(
+                User.email == identifier,
+                User.username == identifier
+            )
+        )
+        .first()
+    )

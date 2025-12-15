@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from app.core.database import Base
+from app.models.book_tag import book_tag
 
 class Book(Base):
     __tablename__ = "books"
@@ -18,3 +19,10 @@ class Book(Base):
     # Relation vers BorrowRecord        
     # borrow_records = relationship("BorrowRecord", back_populates="book")    
     loans = relationship("Loan", back_populates="book")
+
+    tags = relationship(
+        "Tag",
+        secondary=book_tag,
+        back_populates="books"
+    )
+    
