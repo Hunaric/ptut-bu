@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.user import UserCreate, User, UserUpdate
 from app.schemas.account import AccountUpdate
-from app.crud.user import create_user_with_account, update_user, get_user
+from app.crud.user import create_user_with_account, update_user, get_user, assign_permission_to_user, remove_permission_from_user
 from app.crud.account import update_account
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -35,3 +35,15 @@ def update_account_info(user_id: int, updates: AccountUpdate, db: Session = Depe
 
     updated_account = update_account(db, db_user.account, updates)
     return db_user
+
+
+@router.post("/{user_id}/permissions/{permission_id}", response_model=User)
+def add_permission_to_user(user_id: str, permission_id: int, db: Session = Depends(get_db)):
+    user = assign_permission_to_user(db, user_id, permission_id)
+    return user
+
+
+@router.delete("/{user_id}/permissions/{permission_id}", response_model=User)
+def remove_permission_from_user_endpoint(user_id: str, permission_id: int, db: Session = Depends(get_db)):
+    user = remove_permission_from_user(db, user_id, permission_id)
+    return user

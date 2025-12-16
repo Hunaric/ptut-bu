@@ -1,9 +1,11 @@
 from operator import or_
 from sqlalchemy.orm import Session
+from http.client import HTTPException
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 from app.crud.account import create_account
-from app.core.security import hash_password 
+from app.core.security import hash_password
+from app.models.permission import Permission 
 
 def create_user_with_account(db: Session, user: UserCreate):
     # 1. Création du compte
@@ -15,6 +17,7 @@ def create_user_with_account(db: Session, user: UserCreate):
         username=user.username,
         hashed_password=hash_password(user.hashed_password),
         account_id=db_account.id,
+        role_id=user.role_id
     )
 
     db.add(db_user)
@@ -52,3 +55,31 @@ def get_user_by_identifier(db: Session, identifier: str):
         )
         .first()
     )
+
+def assign_permission_to_user(db: Session, user_id: str, permission_id: int):
+    user = db.query(User).filter(User.id == user_id).first()
+    permission = db.query(Permission).filter(Permission.id == permission_id).first()
+
+    if not user or not permission:
+        raise HTTPException(status_code=404, detail="User or Permission not found")
+
+    if permission not in user.permissions:
+        user.permissions.append(permission)
+        db.commit()
+        db.refresh(user)
+
+    return user
+
+def remove_permission_from_user(db: Session, user_id: str, permission_id: int):
+    user = db.query(User).filter(User.id == user_id).first()
+    permission = db.query(Permission).filter(Permission.id == permission_id).first()
+
+    if not user or not permission:
+        raise HTTPException(status_code=404, detail="User or Permission not found")
+
+    if permission in user.permissions:
+        user.permissions.remove(permission)
+        db.commit()
+        db.refresh(user)
+
+    return user

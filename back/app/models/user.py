@@ -19,6 +19,13 @@ class User(Base):
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
     role = relationship("Role", back_populates="users")
 
+    # Permissions directes
+    permissions = relationship(
+        "Permission",
+        secondary="user_permissions",
+        back_populates="users"
+    )
+
     # Lien vers la personne
     account_id = Column(UUID(as_uuid=True), ForeignKey("accounts.id"), nullable=True)
     account = relationship("Account", back_populates="user")

@@ -64,3 +64,32 @@ def require_superuser(current_user: User = Depends(get_current_user)):
             detail="Superuser privileges required."
         )
     return current_user
+
+
+
+def has_permission(user: User, permission_name: str) -> bool:
+    # Superuser bypass
+    if user.is_superuser:
+        return True
+
+    # Permissions directes
+    if any(p.name == permission_name for p in user.permissions):
+        return True
+
+    # Permissions via le rôle
+    if user.role and any(p.name == permission_name for p in user.role.permissions):
+        return True
+
+    return False
+
+def require_permission(permission: str):
+    def checker(current_user: User = Depends(get_current_user)):
+        if current_user.is_superuser:
+            return True
+        if not has_permission(current_user, permission):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Permission denied"
+            )
+        return True
+    return checker
