@@ -12,23 +12,30 @@ def get_books(db: Session):
     return db.query(Book).all()
 
 def create_book(db: Session, book: BookCreate):
+    if book.isbn:
+        existing = db.query(Book).filter(Book.isbn == book.isbn).first()
+        if existing:
+            raise HTTPException(
+                status_code=400,
+                detail="ISBN already exists"
+            )
+
+    db_book = Book(**book.dict(exclude={"tags"}))
+
+    if book.tags:
+        tags = db.query(Tag).filter(Tag.id.in_(book.tags)).all()
+        db_book.tags = tags
+
     try:
-        db_book = Book(**book.dict(exclude={"tags"}))
-
-        if book.tags:
-            tags = db.query(Tag).filter(Tag.id.in_(book.tags)).all()
-            db_book.tags = tags
-
         db.add(db_book)
         db.commit()
         db.refresh(db_book)
         return db_book
-
-    except IntegrityError:
+    except IntegrityError as e:
         db.rollback()
         raise HTTPException(
             status_code=400,
-            detail="ISBN already exists"
+            detail="Invalid data (foreign key or constraint error)"
         )
 
 def get_books(db: Session, skip: int = 0, limit: int = 100):
