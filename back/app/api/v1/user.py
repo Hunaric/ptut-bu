@@ -10,9 +10,10 @@ from app.crud.account import update_account
 router = APIRouter(prefix="/users", tags=["Users"])
 
 # CREATE User + Account
-@router.post("/", response_model=User)
+# @router.post("/", response_model=User)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return create_user_with_account(db, user)
+    
 # UPDATE User + Account
 @router.put("/{user_id}", response_model=User)
 def update_user_info(user_id: int, updates: UserUpdate, db: Session = Depends(get_db)):

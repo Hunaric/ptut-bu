@@ -1,6 +1,5 @@
-from app.api.v1 import auth
 from fastapi import FastAPI
-from app.api.v1 import book, user
+from app.api.v1 import auth, book, user, category
 from app.core.database import Base, engine
 from app.models.user import User
 from app.models.role import Role
@@ -20,9 +19,10 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Bibliotheque Universitaire")
 
 # Routes
-app.include_router(book.router, prefix="/books", tags=["Books"])
+app.include_router(book.router)
 app.include_router(user.router) 
 app.include_router(auth.router) 
+app.include_router(category.router)
 
 @app.get("/books")
 async def get_books():

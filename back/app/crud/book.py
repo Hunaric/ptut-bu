@@ -1,19 +1,108 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
+from typing import Optional
+from typing import List
 from app.models.book import Book
-from app.schemas.book import BookCreate
+from app.models.tag import Tag
+from app.schemas.book import BookCreate, BookUpdate
+
 
 def get_books(db: Session):
     return db.query(Book).all()
 
 def create_book(db: Session, book: BookCreate):
-    db_book = Book(**book.dict())
-    db.add(db_book)
-    db.commit()
-    db.refresh(db_book)
-    return db_book
+    try:
+        db_book = Book(**book.dict(exclude={"tags"}))
+
+        if book.tags:
+            tags = db.query(Tag).filter(Tag.id.in_(book.tags)).all()
+            db_book.tags = tags
+
+        db.add(db_book)
+        db.commit()
+        db.refresh(db_book)
+        return db_book
+
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail="ISBN already exists"
+        )
+
+def get_books(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(Book).offset(skip).limit(limit).all()
+
+def get_books_advanced(
+    db: Session,
+    page: int = 1,
+    size: int = 10,
+    category_id: Optional[int] = None,
+    tag_ids: Optional[List[int]] = None
+):
+    query = db.query(Book)
+
+    # 🔍 Filtre catégorie
+    if category_id:
+        query = query.filter(Book.category_id == category_id)
+
+    # 🔍 Filtre tags (livres ayant TOUS les tags)
+    if tag_ids:
+        query = (
+            query.join(Book.tags)
+            .filter(Tag.id.in_(tag_ids))
+            .group_by(Book.id)
+            .having(func.count(Tag.id) == len(tag_ids))
+        )
+
+    total = query.count()
+
+    books = (
+        query
+        .offset((page - 1) * size)
+        .limit(size)
+        .all()
+    )
+
+    return {
+        "total": total,
+        "page": page,
+        "size": size,
+        "items": books
+    }
+
+
+def get_book(db: Session, book_id: int):
+    book = db.query(Book).filter(Book.id == book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return book
+
+def update_book(db: Session, book_id: int, book_data: BookUpdate):
+    book = get_book(db, book_id)
+
+    for key, value in book_data.dict(exclude_unset=True, exclude={"tags"}).items():
+        setattr(book, key, value)
+
+    if book_data.tags is not None:
+        tags = db.query(Tag).filter(Tag.id.in_(book_data.tags)).all()
+        book.tags = tags
+
+    try:
+        db.commit()
+        db.refresh(book)
+        return book
+
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail="ISBN already exists"
+        )
 
 def delete_book(db: Session, book_id: int):
-    book = db.query(models.Book).filter(models.Book.id == book_id).first()
+    book = db.query(Book).filter(Book.id == book_id).first()
 
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")

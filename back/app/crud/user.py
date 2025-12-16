@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 from app.crud.account import create_account
-from app.core.security import hash_password  # si tu utilises fastapi security
+from app.core.security import hash_password 
 
 def create_user_with_account(db: Session, user: UserCreate):
     # 1. Création du compte
