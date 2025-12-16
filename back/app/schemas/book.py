@@ -46,3 +46,12 @@ class BookResponseWithRelations(BookResponse):
     category: Optional[Category]
     # tags: List[TagSimple] = []
     # loans: List[LoanResponse] = []
+
+
+class BookFilter(BaseModel):
+    title: Optional[str] = None
+    author: Optional[str] = None
+    published_after: Optional[int] = None
+    published_before: Optional[int] = None
+    category_ids: Optional[List[int]] = None
+    tag_ids: Optional[List[int]] = None

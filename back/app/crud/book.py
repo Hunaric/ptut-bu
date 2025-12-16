@@ -5,7 +5,7 @@ from typing import Optional
 from typing import List
 from app.models.book import Book
 from app.models.tag import Tag
-from app.schemas.book import BookCreate, BookUpdate
+from app.schemas.book import BookCreate, BookFilter, BookUpdate
 
 
 def get_books(db: Session):
@@ -113,3 +113,22 @@ def delete_book(db: Session, book_id: int):
     db.delete(book)
     db.commit()
     return {"detail": "Book deleted successfully"}
+
+
+def query_books(db: Session, filters: BookFilter):
+    query = db.query(Book)
+
+    if filters.title:
+        query = query.filter(Book.title.ilike(f"%{filters.title}%"))
+    if filters.author:
+        query = query.filter(Book.author.ilike(f"%{filters.author}%"))
+    if filters.published_after:
+        query = query.filter(Book.published_year >= filters.published_after)
+    if filters.published_before:
+        query = query.filter(Book.published_year <= filters.published_before)
+    if filters.category_ids:
+        query = query.filter(Book.category_id.in_(filters.category_ids))
+    if filters.tag_ids:
+        query = query.join(Book.tags).filter(Tag.id.in_(filters.tag_ids))
+
+    return query.all()
