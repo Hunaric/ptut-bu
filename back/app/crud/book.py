@@ -43,11 +43,9 @@ def get_books_advanced(
 ):
     query = db.query(Book)
 
-    # 🔍 Filtre catégorie
     if category_id:
         query = query.filter(Book.category_id == category_id)
 
-    # 🔍 Filtre tags (livres ayant TOUS les tags)
     if tag_ids:
         query = (
             query.join(Book.tags)
