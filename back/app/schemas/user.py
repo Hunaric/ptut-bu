@@ -24,6 +24,6 @@ class User(UserBase):
     role: Optional[RoleResponse] = None
     account: Optional[Account] = None
 
-    class Config:
-        from_attributes = True
-        
+    model_config = {
+        "from_attributes": True
+    }

@@ -38,9 +38,10 @@ class BookUpdate(BaseModel):
 # =========================
 class BookResponse(BookBase):
     id: int
-
-    class Config:
-        from_attributes = True  # Pydantic v2 (équivalent orm_mode)
+    
+    model_config = {
+        "from_attributes": True
+    }
 
 class BookResponseWithRelations(BookResponse):
     category: Optional[Category]

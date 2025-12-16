@@ -27,9 +27,10 @@ class AccountUpdate(AccountBase):
 
 class Account(AccountBase):
     id: uuid.UUID
-
-    class Config:
-        from_attributes = True
+    
+    model_config = {
+        "from_attributes": True
+    }
 
 
 class RegisterRequest(BaseModel):

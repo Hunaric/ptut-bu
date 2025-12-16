@@ -93,3 +93,25 @@ def require_permission(permission: str):
             )
         return True
     return checker
+
+def require_any_permission(*permissions: str):
+    def permission_checker(
+        current_user: User = Depends(get_current_user)
+    ):
+        if current_user.is_superuser:
+            return current_user
+
+        user_permissions = {p.name for p in current_user.permissions}
+
+        if current_user.role:
+            user_permissions |= {p.name for p in current_user.role.permissions}
+
+        if not any(p in user_permissions for p in permissions):
+            raise HTTPException(
+                status_code=403,
+                detail=f"One of {permissions} is required"
+            )
+
+        return current_user
+
+    return permission_checker

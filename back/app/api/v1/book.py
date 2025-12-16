@@ -5,7 +5,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.crud import book as crud
 from app.schemas.book import BookCreate, BookResponse, BookUpdate
-from app.core.dependencies import require_admin, require_superuser
+from app.core.dependencies import require_admin, require_permission, require_superuser
 from app.core.database import get_db
 
 router = APIRouter()
@@ -49,6 +49,15 @@ def read_one(book_id: int, db: Session = Depends(get_db)):
 def update(book_id: int, book: BookUpdate, db: Session = Depends(get_db)):
     return crud.update_book(db, book_id, book)
 
-@router.delete("/{book_id}")
+@router.delete(
+    "/{book_id}",
+    dependencies=[Depends(require_permission("book:delete"))]
+    )
 def delete(book_id: int, db: Session = Depends(get_db)):
     return crud.delete_book(db, book_id)
+
+# L'utilisateur doit avoir la permission "loan:create" et "loan:validate" pour emprunter un livre (les deux sont requises)
+# dependencies=[
+#     Depends(require_permission("loan:create")),
+#     Depends(require_permission("loan:validate"))
+# ]
