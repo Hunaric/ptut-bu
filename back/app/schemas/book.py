@@ -4,6 +4,7 @@ from .category import Category
 # =========================
 # Base
 # =========================
+
 class BookBase(BaseModel):
     title: str
     author: Optional[str] = None
@@ -11,6 +12,8 @@ class BookBase(BaseModel):
     isbn: Optional[str] = None
     published_year: Optional[int] = None
     category_id: Optional[int] = None
+    quantity: Optional[int] = 1
+    cover_url: Optional[str] = None
 
 
 # =========================
@@ -30,8 +33,9 @@ class BookUpdate(BaseModel):
     isbn: Optional[str] = None
     published_year: Optional[int] = None
     category_id: Optional[int] = None
+    quantity: Optional[int] = None
+    cover_url: Optional[str] = None
     tags: Optional[List[int]] = None
-
 
 # =========================
 # Réponse (lecture)
@@ -43,9 +47,18 @@ class BookResponse(BookBase):
         "from_attributes": True
     }
 
+class TagSimple(BaseModel):
+    id: int
+    name: str
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
 class BookResponseWithRelations(BookResponse):
     category: Optional[Category]
-    # tags: List[TagSimple] = []
+    tags: List[TagSimple] = []
     # loans: List[LoanResponse] = []
 
 
