@@ -89,3 +89,10 @@ Là tu verras tous les utilisateurs que tu as créés.
 Un autre pull request a ete inite ce 14/12/2025
 
 système RBAC (Role-Based Access Control)
+
+
+```
+'docker exec -it ptut_back python -m app.script.import_openlibrary' --> pour lancer le script 
+
+'docker exec -it ptut_back alembic revision --autogenerate -m "Apply Account model"'
+'docker exec -it ptut_back alembic stamp head'

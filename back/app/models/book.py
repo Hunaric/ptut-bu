@@ -13,6 +13,10 @@ class Book(Base):
     isbn = Column(String(20), unique=True, nullable=True)
     published_year = Column(Integer, nullable=True)
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
+    
+    quantity = Column(Integer, nullable=False, default=1)
+
+    cover_url = Column(String(500), nullable=True)
 
     # Relation vers Category
     category = relationship("Category", back_populates="books")

@@ -20,7 +20,10 @@ def create_book(db: Session, book: BookCreate):
                 detail="ISBN already exists"
             )
 
-    db_book = Book(**book.dict(exclude={"tags"}))
+    db_book = Book(
+        **book.dict(exclude={"tags"}),
+        cover_url=get_cover_url(book.isbn)
+    )
 
     if book.tags:
         tags = db.query(Tag).filter(Tag.id.in_(book.tags)).all()
@@ -31,12 +34,69 @@ def create_book(db: Session, book: BookCreate):
         db.commit()
         db.refresh(db_book)
         return db_book
-    except IntegrityError as e:
+
+    except IntegrityError:
         db.rollback()
         raise HTTPException(
             status_code=400,
             detail="Invalid data (foreign key or constraint error)"
         )
+
+
+def update_book(db: Session, book_id: int, book_data: BookUpdate):
+    book = get_book(db, book_id)
+
+    data = book_data.dict(exclude_unset=True, exclude={"tags"})
+
+    if "isbn" in data:
+        data["cover_url"] = get_cover_url(data["isbn"])
+
+    for key, value in data.items():
+        setattr(book, key, value)
+
+    if book_data.tags is not None:
+        tags = db.query(Tag).filter(Tag.id.in_(book_data.tags)).all()
+        book.tags = tags
+
+    try:
+        db.commit()
+        db.refresh(book)
+        return book
+
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail="ISBN already exists"
+        )
+
+
+# def create_book(db: Session, book: BookCreate):
+#     if book.isbn:
+#         existing = db.query(Book).filter(Book.isbn == book.isbn).first()
+#         if existing:
+#             raise HTTPException(
+#                 status_code=400,
+#                 detail="ISBN already exists"
+#             )
+
+#     db_book = Book(**book.dict(exclude={"tags"}))
+
+#     if book.tags:
+#         tags = db.query(Tag).filter(Tag.id.in_(book.tags)).all()
+#         db_book.tags = tags
+
+#     try:
+#         db.add(db_book)
+#         db.commit()
+#         db.refresh(db_book)
+#         return db_book
+#     except IntegrityError as e:
+#         db.rollback()
+#         raise HTTPException(
+#             status_code=400,
+#             detail="Invalid data (foreign key or constraint error)"
+#         )
 
 def get_books(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Book).offset(skip).limit(limit).all()
@@ -84,27 +144,27 @@ def get_book(db: Session, book_id: int):
         raise HTTPException(status_code=404, detail="Book not found")
     return book
 
-def update_book(db: Session, book_id: int, book_data: BookUpdate):
-    book = get_book(db, book_id)
+# def update_book(db: Session, book_id: int, book_data: BookUpdate):
+#     book = get_book(db, book_id)
 
-    for key, value in book_data.dict(exclude_unset=True, exclude={"tags"}).items():
-        setattr(book, key, value)
+#     for key, value in book_data.dict(exclude_unset=True, exclude={"tags"}).items():
+#         setattr(book, key, value)
 
-    if book_data.tags is not None:
-        tags = db.query(Tag).filter(Tag.id.in_(book_data.tags)).all()
-        book.tags = tags
+#     if book_data.tags is not None:
+#         tags = db.query(Tag).filter(Tag.id.in_(book_data.tags)).all()
+#         book.tags = tags
 
-    try:
-        db.commit()
-        db.refresh(book)
-        return book
+#     try:
+#         db.commit()
+#         db.refresh(book)
+#         return book
 
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(
-            status_code=400,
-            detail="ISBN already exists"
-        )
+#     except IntegrityError:
+#         db.rollback()
+#         raise HTTPException(
+#             status_code=400,
+#             detail="ISBN already exists"
+#         )
 
 def delete_book(db: Session, book_id: int):
     book = db.query(Book).filter(Book.id == book_id).first()
@@ -139,3 +199,9 @@ def query_books(db: Session, filters: BookFilter):
         query = query.join(Book.tags).filter(Tag.id.in_(filters.tag_ids))
 
     return query.all()
+
+def get_cover_url(isbn: str | None) -> str | None:
+    if not isbn:
+        return None
+    return f"https://covers.openlibrary.org/b/isbn/{isbn}-L.jpg"
+
