@@ -1,5 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+
+from typing import List, Optional
+from app.models.user import User as UserModel
 
 from app.core.database import get_db
 from app.schemas.user import UserCreate, User, UserUpdate
@@ -47,3 +50,19 @@ def add_permission_to_user(user_id: str, permission_id: int, db: Session = Depen
 def remove_permission_from_user_endpoint(user_id: str, permission_id: int, db: Session = Depends(get_db)):
     user = remove_permission_from_user(db, user_id, permission_id)
     return user
+
+# GET all users
+@router.get("/", response_model=List[User])
+def list_users(
+    skip: int = Query(0, ge=0, description="Nombre d'utilisateurs à sauter"),
+    limit: int = Query(50, le=200, description="Nombre maximum d'utilisateurs à retourner"),
+    db: Session = Depends(get_db)
+):
+    """
+    Récupère la liste des utilisateurs.
+    Paramètres:
+    - skip: nombre d'utilisateurs à sauter (pagination)
+    - limit: nombre maximum d'utilisateurs à retourner
+    """
+    users = db.query(UserModel).offset(skip).limit(limit).all()
+    return users

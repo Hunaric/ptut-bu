@@ -2,6 +2,7 @@ from app.schemas.role import RoleResponse
 from pydantic import BaseModel
 from typing import Optional
 from .account import Account, AccountCreate
+import uuid
 
 class UserBase(BaseModel):
     email: str
@@ -20,7 +21,7 @@ class UserUpdate(BaseModel):
     role: Optional[RoleResponse] = None
 
 class User(UserBase):
-    id: int
+    id: uuid.UUID  
     role: Optional[RoleResponse] = None
     account: Optional[Account] = None
 

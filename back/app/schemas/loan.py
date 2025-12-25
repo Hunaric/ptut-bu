@@ -1,39 +1,57 @@
+from typing import Literal
 from pydantic import BaseModel
 from datetime import date
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 
-class LoanBase(BaseModel):
+# --------------------------
+# Input pour créer un prêt
+# --------------------------
+class LoanCreate(BaseModel):
     book_id: int
-    due_date: date
+    # plus besoin de user_id ici, il sera pris depuis le token JWT
 
-class LoanCreate(LoanBase):
-    user_id: UUID  # l’étudiant à qui on prête
-
+# --------------------------
+# Input pour retourner un livre
+# --------------------------
 class LoanReturn(BaseModel):
     return_date: Optional[date] = None
 
+# --------------------------
+# Input pour mettre à jour un prêt (ex: prolongation)
+# --------------------------
 class LoanUpdate(BaseModel):
     due_date: Optional[date] = None
 
+# --------------------------
+# Réponse d'un prêt
+# --------------------------
 class LoanResponse(BaseModel):
     id: int
     book_id: int
-    user_id: UUID
-    loan_date: date
-    due_date: date
+    user_id: Optional[UUID]
+    loan_date: Optional[date]
+    due_date: Optional[date]
     return_date: Optional[date]
     status: str
+    ticket: Optional[str]
+    book_quantity: Optional[int]  # quantité actuelle du livre
 
     model_config = {
         "from_attributes": True
     }
 
-from typing import List
-
+# --------------------------
+# Filtres pour rechercher des prêts
+# --------------------------
 class LoanFilter(BaseModel):
     student_ids: Optional[List[UUID]] = None
     status: Optional[str] = None      # ongoing, returned, late
     overdue: Optional[bool] = None
     start_date: Optional[date] = None
     end_date: Optional[date] = None
+
+
+
+class LoanUpdateStatus(BaseModel):
+    status: Literal["requested", "approved", "ongoing", "returned", "late"]

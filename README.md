@@ -94,5 +94,6 @@ système RBAC (Role-Based Access Control)
 ```
 'docker exec -it ptut_back python -m app.script.import_openlibrary' --> pour lancer le script 
 
+Pour changer la bd
 'docker exec -it ptut_back alembic revision --autogenerate -m "Apply Account model"'
 'docker exec -it ptut_back alembic stamp head'

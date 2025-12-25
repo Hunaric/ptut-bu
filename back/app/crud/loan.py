@@ -1,57 +1,109 @@
-from datetime import date
+from datetime import date, timedelta
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models.loan import Loan
+from app.models.book import Book
 from app.schemas.loan import LoanCreate, LoanFilter
-from fastapi import HTTPException
+import uuid
+from datetime import date, timedelta
 
-def create_loan(db: Session, data: LoanCreate):
+def create_loan(db: Session, data: LoanCreate, user_id: uuid.UUID):
+    book = db.query(Book).filter(Book.id == data.book_id).first()
+    if not book:
+        raise HTTPException(404, "Book not found")
+
+    if book.quantity <= 0:
+        raise HTTPException(400, "No copies available")
+
     loan = Loan(
-        book_id=data.book_id,
-        user_id=data.user_id,
+        book_id=book.id,
+        user_id=user_id,
+        ticket=str(uuid.uuid4()),
         loan_date=date.today(),
-        due_date=data.due_date,
-        status="ongoing"
+        due_date=date.today() + timedelta(days=14)
     )
+
+    # Mettre à jour la quantité de copies disponibles
+    book.quantity -= 1
+
+    # Ajouter la quantité actuelle au prêt
+    loan.book_quantity = book.quantity
 
     db.add(loan)
     db.commit()
     db.refresh(loan)
     return loan
 
-def return_loan(db: Session, loan_id: int):
+def approve_loan(db: Session, loan_id: int):
     loan = db.query(Loan).filter(Loan.id == loan_id).first()
-
     if not loan:
         raise HTTPException(404, "Loan not found")
 
-    if loan.status == "returned":
-        raise HTTPException(400, "Loan already returned")
+    if loan.status != "requested":
+        raise HTTPException(400, "Loan cannot be approved")
 
+    book = db.query(Book).filter(Book.id == loan.book_id).first()
+    if not book or book.quantity <= 0:
+        raise HTTPException(400, "No copies available for this book")
+
+    book.quantity -= 1
+    loan.status = "approved"
+    loan.loan_date = date.today()
+    loan.due_date = date.today() + timedelta(days=14)
+    db.commit()
+    db.refresh(loan)
+
+    # ajoute la quantité actuelle dans l'objet loan
+    loan.book_quantity = book.quantity
+    return loan
+
+
+def return_loan(db: Session, loan_id: int):
+    loan = db.query(Loan).filter(Loan.id == loan_id).first()
+    if not loan:
+        raise HTTPException(404, "Loan not found")
+
+    if loan.status not in ["approved", "ongoing"]:
+        raise HTTPException(400, "Loan cannot be returned")
+
+    book = db.query(Book).filter(Book.id == loan.book_id).first()
+    if not book:
+        raise HTTPException(404, "Book not found")
+
+    book.quantity += 1
     loan.return_date = date.today()
+    loan.status = "returned" if loan.return_date <= loan.due_date else "late"
+    db.commit()
+    db.refresh(loan)
 
-    if loan.return_date > loan.due_date:
-        loan.status = "late"
-    else:
-        loan.status = "returned"
+    loan.book_quantity = book.quantity
+    return loan
+
+def update_loan_status(db: Session, loan_id: int, new_status: str):
+    loan = db.query(Loan).filter(Loan.id == loan_id).first()
+    if not loan:
+        raise HTTPException(404, "Loan not found")
+
+    book = db.query(Book).filter(Book.id == loan.book_id).first()
+    if not book:
+        raise HTTPException(404, "Book not found")
+
+    # Gérer la logique selon le nouveau status
+    if new_status == "approved":
+        if book.quantity <= 0:
+            raise HTTPException(400, "No copies available for this book")
+        book.quantity -= 1
+        loan.loan_date = date.today()
+        loan.due_date = date.today() + timedelta(days=14)
+
+    elif new_status in ["returned", "late"]:
+        book.quantity += 1
+        loan.return_date = date.today()
+
+    # Mettre à jour le status
+    loan.status = new_status
+    loan.book_quantity = book.quantity
 
     db.commit()
     db.refresh(loan)
     return loan
-
-
-def query_loans(db: Session, filters: LoanFilter):
-    query = db.query(Loan)
-
-    if filters.student_ids:
-        query = query.filter(Loan.user_id.in_(filters.student_ids))
-
-    if filters.status:
-        query = query.filter(Loan.status == filters.status)
-
-    if filters.overdue:
-        query = query.filter(
-            Loan.status == "ongoing",
-            Loan.due_date < date.today()
-        )
-
-    return query.all()

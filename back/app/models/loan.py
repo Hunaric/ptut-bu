@@ -11,6 +11,7 @@ class Loan(Base):
 
     # relations
     book_id = Column(Integer, ForeignKey("books.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
 
     # dates
     loan_date = Column(Date, nullable=False)            # date du prêt
@@ -18,10 +19,12 @@ class Loan(Base):
     return_date = Column(Date, nullable=True)           # date réelle de retour
 
     # statut
-    status = Column(String(50), nullable=False, default="ongoing")  
-    # exemples : "ongoing", "returned", "late"
+    status = Column(String(50), nullable=False, default="requested")  
+    # "requested", "approved", "ongoing", "returned", "late"
 
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+
+    # Ticket pour récupérer le livre
+    ticket = Column(String(36), nullable=True, unique=True)
 
     # relations ORM
     book = relationship("Book", back_populates="loans")

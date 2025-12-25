@@ -19,7 +19,6 @@ from app.models.loan import Loan
 from app.models.permission import Permission
 from app.models.role import Role
 from app.models.tag import Tag
-from app.models.user_permission import user_permission
 from app.models.user import User
 
 target_metadata = Base.metadata
