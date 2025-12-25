@@ -20,6 +20,7 @@ from app.models.permission import Permission
 from app.models.role import Role
 from app.models.tag import Tag
 from app.models.user import User
+from app.models.calendar_event import CalendarEvent
 
 target_metadata = Base.metadata
 # Interpret the config file for Python logging.

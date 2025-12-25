@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.v1 import auth, book, user, category, role, permission, loan
+from app.api.v1 import auth, book, user, category, role, permission, loan, calendar
 from app.core.database import Base, engine
 from app.models.user import User
 from app.models.role import Role
@@ -11,6 +11,7 @@ from app.models.book import Book
 from app.models.tag import Tag
 from app.models.book_tag import book_tag
 from app.models.loan import Loan
+from app.models.calendar_event import CalendarEvent
 # from app.models.role_permission import RolePermission
 
 
@@ -27,6 +28,7 @@ app.include_router(category.router)
 app.include_router(role.router)
 app.include_router(permission.router)
 app.include_router(loan.router)
+app.include_router(calendar.router)
 
 @app.get("/books")
 async def get_books():

@@ -8,5 +8,6 @@ from .book import Book
 from .tag import Tag
 from .book_tag import book_tag
 from .loan import Loan
-from .user_permission import user_permissions   
+from .user_permission import user_permissions 
+from .calendar_event import CalendarEvent  
 # from .role_permission import RolePermission 
