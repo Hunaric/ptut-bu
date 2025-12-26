@@ -6,7 +6,8 @@ from app.models.book import Book
 from app.models.loan import Loan
 from datetime import date
 
-router = APIRouter()
+
+router = APIRouter(prefix="/stats", tags=["Stats"])
 
 @router.get("/dashboard/stats")
 def get_dashboard_stats(db: Session = Depends(get_db)):
