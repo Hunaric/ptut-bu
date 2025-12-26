@@ -4,8 +4,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../environment/environment';
-import { Book } from '../models/book.model';
-import { PaginatedResponse } from '../models/paginated-response';
+import { PaginatedResponse } from '../interfaces/paginated-response';
+import { Book } from '../interfaces/book';
 
 @Injectable({
   providedIn: 'root',
@@ -82,7 +82,8 @@ export class BookService {
   ): Promise<PaginatedResponse<Book>> {
 
     const url = `${this.apiUrl}/advanced`;
-
+    console.log(url);
+    
     let params = new HttpParams()
       .set('page', page)
       .set('size', size);

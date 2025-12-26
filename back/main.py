@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import auth, book, user, category, role, permission, loan, calendar
 from app.core.database import Base, engine
 from app.models.user import User
@@ -19,6 +20,20 @@ from app.models.calendar_event import CalendarEvent
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Bibliotheque Universitaire")
+
+origins = [
+    "http://localhost:4300",  # Angular dev server
+    "http://localhost:4200",  # si utilisé
+    "http://127.0.0.1:4300",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # ou ["*"] pour autoriser toutes les origines (pas recommandé en prod)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Routes
 app.include_router(book.router)

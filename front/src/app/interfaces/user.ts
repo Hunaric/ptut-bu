@@ -1,6 +1,7 @@
 // user.model.ts
-import { Role } from './role.model';
-import { Permission } from './permission.model';
+
+import { Permission } from "./permission";
+import { Role } from "./role";
 
 export interface User {
   id: string;           // UUID

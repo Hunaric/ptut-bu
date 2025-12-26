@@ -1,5 +1,6 @@
 // auth.model.ts
-import { User } from './user.model';
+
+import { User } from "./user";
 
 export interface LoginRequest {
   email: string;

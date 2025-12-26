@@ -1,5 +1,6 @@
 // book.model.ts
-import { Category } from './category.model';
+
+import { Category } from "./category";
 
 export interface Book {
   id: number;

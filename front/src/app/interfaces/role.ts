@@ -1,5 +1,6 @@
 // role.model.ts
-import { Permission } from './permission.model';
+
+import { Permission } from "./permission";
 
 export interface Role {
   id: number;

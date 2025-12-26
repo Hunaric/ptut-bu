@@ -2,10 +2,13 @@ FROM node:24-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copier les fichiers package.json et package-lock.json
+COPY package.json package-lock.json ./
 
-RUN npm install --legacy-peer-deps
+# Installer toutes les dépendances
+RUN npm ci --legacy-peer-deps
 
+# Copier tout le projet
 COPY . .
 
 EXPOSE 4200
