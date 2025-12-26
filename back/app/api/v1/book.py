@@ -22,6 +22,13 @@ def create(book: BookCreate, db: Session = Depends(get_db),
 def read_all(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.get_books(db, skip, limit)
 
+@router.get("/search", response_model=List[BookResponse])
+def search_books(title: str = Query(..., min_length=1), db: Session = Depends(get_db)):
+    """
+    Recherche des livres par titre (partiel, insensible à la casse)
+    """
+    return crud.search_books_by_title(db, title)
+
 @router.get(
     "/advanced",
     response_model=PaginatedResponse[BookResponse]

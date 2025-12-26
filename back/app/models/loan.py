@@ -1,33 +1,39 @@
-from uuid import UUID
 from sqlalchemy import Column, Integer, Date, ForeignKey, String
 from sqlalchemy.orm import relationship
-from app.core.database import Base
 from sqlalchemy.dialects.postgresql import UUID
+from app.core.database import Base
 
 class Loan(Base):
     __tablename__ = "loans"
 
     id = Column(Integer, primary_key=True, index=True)
 
-    # relations
     book_id = Column(Integer, ForeignKey("books.id"), nullable=False)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
 
-    # dates
-    loan_date = Column(Date, nullable=False)            # date du prêt
-    due_date = Column(Date, nullable=False)             # date limite pour rendre
-    return_date = Column(Date, nullable=True)           # date réelle de retour
+    # emprunteur
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
 
-    # statut
-    status = Column(String(50), nullable=False, default="requested")  
-    # "requested", "approved", "ongoing", "returned", "late"
+    # staff qui approuve
+    approved_by_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
 
+    loan_date = Column(Date, nullable=False)
+    due_date = Column(Date, nullable=False)
+    return_date = Column(Date, nullable=True)
 
-    # Ticket pour récupérer le livre
+    status = Column(String(50), nullable=False, default="requested")
     ticket = Column(String(36), nullable=True, unique=True)
 
-    # relations ORM
+    # relations
     book = relationship("Book", back_populates="loans")
-    user = relationship("User", back_populates="loans")
 
+    borrower = relationship(
+        "User",
+        foreign_keys=[user_id],
+        back_populates="borrowed_loans"
+    )
 
+    approved_by = relationship(
+        "User",
+        foreign_keys=[approved_by_id],
+        back_populates="approved_loans"
+    )

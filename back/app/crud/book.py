@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
+from sqlalchemy import or_
 from typing import List
 from app.models.book import Book
 from app.models.tag import Tag
@@ -207,3 +208,7 @@ def get_cover_url(isbn: str | None) -> str | None:
         return None
     return f"https://covers.openlibrary.org/b/isbn/{isbn}-L.jpg"
 
+
+def search_books_by_title(db: Session, title: str):
+    query = db.query(Book).filter(Book.title.ilike(f"%{title}%"))
+    return query.all()

@@ -30,9 +30,10 @@ def create_loan_route(
 )
 def approve_loan_route(
     loan_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    return crud.approve_loan(db, loan_id)
+    return crud.approve_loan(db, loan_id, current_user)
 
 
 @router.post(

@@ -36,19 +36,16 @@ export class BookComponent implements OnInit {
   }
 
 async loadBooks(): Promise<void> {
-  console.log('Appel à loadBooks(), page actuelle :', this.page);
   this.loading = true;
   try {
     const res: PaginatedResponse<Book> = await this.bookService.getBooksAdvanced(this.page, this.size);
     this.books = res.items;
     this.totalPages = Math.ceil(res.total / res.size);
     this.page = res.page;
-    console.log("Lui");
     
   } catch (err) {
     console.error('Erreur lors du chargement des livres', err);
   } finally {
-    console.log("MOi");
     
     this.loading = false;
   }

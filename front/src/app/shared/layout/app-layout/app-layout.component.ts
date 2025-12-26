@@ -6,6 +6,7 @@ import { AppBackdropComponent } from "../app-backdrop/app-backdrop.component";
 import { AppFooterComponent } from '../app-footer/app-footer.component';
 import { CommonModule } from '@angular/common';
 import { SidebarService } from '../../services/sidebar.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-app-layout',
@@ -15,7 +16,8 @@ import { SidebarService } from '../../services/sidebar.service';
     AppHeaderComponent,
     AppSidebarComponent,
     AppBackdropComponent, 
-    AppFooterComponent
+    AppFooterComponent,
+    FormsModule
 ],
   templateUrl: './app-layout.component.html',
   styleUrl: './app-layout.component.css'

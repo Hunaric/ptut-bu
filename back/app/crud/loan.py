@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models.loan import Loan
+from app.models.user import User
 from app.models.book import Book
 from app.schemas.loan import LoanCreate, LoanFilter
 import uuid
@@ -34,27 +35,27 @@ def create_loan(db: Session, data: LoanCreate, user_id: uuid.UUID):
     db.refresh(loan)
     return loan
 
-def approve_loan(db: Session, loan_id: int):
+def approve_loan(db: Session, loan_id: int, staff_user: User):
     loan = db.query(Loan).filter(Loan.id == loan_id).first()
-    if not loan:
-        raise HTTPException(404, "Loan not found")
 
     if loan.status != "requested":
         raise HTTPException(400, "Loan cannot be approved")
 
     book = db.query(Book).filter(Book.id == loan.book_id).first()
-    if not book or book.quantity <= 0:
-        raise HTTPException(400, "No copies available for this book")
+    if book.quantity <= 0:
+        raise HTTPException(400, "No copies available")
 
     book.quantity -= 1
+
     loan.status = "approved"
     loan.loan_date = date.today()
     loan.due_date = date.today() + timedelta(days=14)
+
+    # 👇 ICI
+    loan.approved_by_id = staff_user.id
+
     db.commit()
     db.refresh(loan)
-
-    # ajoute la quantité actuelle dans l'objet loan
-    loan.book_quantity = book.quantity
     return loan
 
 

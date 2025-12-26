@@ -30,4 +30,16 @@ class User(Base):
     account_id = Column(UUID(as_uuid=True), ForeignKey("accounts.id"), nullable=True)
     account = relationship("Account", back_populates="user")
 
-    loans = relationship("Loan", back_populates="user")
+    # prêts en tant qu'emprunteur
+    borrowed_loans = relationship(
+        "Loan",
+        foreign_keys="Loan.user_id",
+        back_populates="borrower"
+    )
+
+    # prêts approuvés en tant que staff
+    approved_loans = relationship(
+        "Loan",
+        foreign_keys="Loan.approved_by_id",
+        back_populates="approved_by"
+    )

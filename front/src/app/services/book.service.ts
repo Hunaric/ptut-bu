@@ -1,7 +1,7 @@
 // book.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 
 import { environment } from '../../environment/environment';
 import { PaginatedResponse } from '../interfaces/paginated-response';
@@ -169,5 +169,10 @@ export class BookService {
       console.error(`Erreur lors de la suppression du livre ${id}`, error);
       throw error;
     }
+  }
+  
+  searchBooks(title: string): Observable<Book[]> {
+    const params = new HttpParams().set('title', title);
+    return this.http.get<Book[]>(`${this.apiUrl}/search`, { params });
   }
 }
