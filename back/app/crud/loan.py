@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from app.schemas.pagination import PaginatedResponse
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models.loan import Loan
@@ -7,6 +8,38 @@ from app.models.book import Book
 from app.schemas.loan import LoanCreate, LoanFilter
 import uuid
 from datetime import date, timedelta
+
+def get_loan_by_id(db: Session, loan_id: int):
+    loan = db.query(Loan).filter(Loan.id == loan_id).first()
+    if not loan:
+        raise HTTPException(404, "Loan not found")
+    return loan
+
+def get_all_loans(db: Session):
+    return db.query(Loan).all()
+
+def get_loans_advanced(
+    db: Session,
+    page: int = 1,
+    size: int = 10
+):
+    query = db.query(Loan)
+
+    total = query.count()
+
+    loans = (
+        query
+        .offset((page - 1) * size)
+        .limit(size)
+        .all()
+    )
+
+    return PaginatedResponse[Loan](
+        total=total,
+        page=page,
+        size=size,
+        items=loans
+    )
 
 def create_loan(db: Session, data: LoanCreate, user_id: uuid.UUID):
     book = db.query(Book).filter(Book.id == data.book_id).first()
@@ -108,3 +141,6 @@ def update_loan_status(db: Session, loan_id: int, new_status: str):
     db.commit()
     db.refresh(loan)
     return loan
+
+def get_user_loans(db: Session, user_id: uuid.UUID):
+    return db.query(Loan).filter(Loan.user_id == user_id).all()

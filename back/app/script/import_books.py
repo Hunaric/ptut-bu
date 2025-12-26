@@ -17,15 +17,15 @@ MIN_BOOKS_PER_CATEGORY = 50
 
 # Liste de catégories avec requête associée
 QUERIES = {
-    "Science Fiction": "science fiction",
-    "Fantasy": "fantasy",
-    "Romance": "romance",
-    "Thriller": "thriller",
-    "Mystery": "mystery",
-    "History": "history",
-    "Biography": "biography",
-    "Horror": "horror",
-    "Children": "children",
+    # "Science Fiction": "science fiction",
+    # "Fantasy": "fantasy",
+    # "Romance": "romance",
+    # "Thriller": "thriller",
+    # "Mystery": "mystery",
+    # "History": "history",
+    # "Biography": "biography",
+    # "Horror": "horror",
+    # "Children": "children",
     "Young Adult": "young adult",
 }
 
@@ -60,6 +60,9 @@ def import_books():
         if not other_category:
             raise Exception("❌ La catégorie 'Other' doit exister")
 
+        # ✅ Créer l'ensemble des ISBN existants une seule fois
+        existing_isbns = {b.isbn for b in db.query(Book.isbn).all()}
+
         total_imported = 0
 
         for category_name, query in QUERIES.items():
@@ -85,8 +88,9 @@ def import_books():
                     if imported_for_category >= MIN_BOOKS_PER_CATEGORY:
                         break
 
-                    isbn = doc.get("isbn", [None])[0]
-                    if isbn and db.query(Book).filter(Book.isbn == isbn).first():
+                    isbn_list = doc.get("isbn")
+                    isbn = isbn_list[0] if isbn_list else doc.get("cover_edition_key") or doc.get("key")
+                    if not isbn or isbn in existing_isbns:
                         continue
 
                     title = doc.get("title")
@@ -120,12 +124,12 @@ def import_books():
                     # Création du livre
                     book = Book(
                         title=title,
-                        author=doc.get("author_name", [None])[0],
+                        author=(doc.get("author_name") or [None])[0],
                         description=description,
                         isbn=isbn,
                         published_year=doc.get("first_publish_year"),
                         cover_url=get_cover_url(doc),
-                        quantity=random.randint(0, 15),
+                        quantity=random.randint(1, 23),
                         category=category,
                         tags=book_tags
                     )
@@ -133,6 +137,7 @@ def import_books():
                     db.add(book)
                     imported_for_category += 1
                     total_imported += 1
+                    existing_isbns.add(isbn)  # <- ajoute immédiatement pour éviter doublons
 
                 page += 1
 

@@ -9,7 +9,7 @@ from fastapi import HTTPException
 
 fake = Faker()
 
-N_USERS = 20  # nombre d'utilisateurs à générer
+N_USERS = 70  # nombre d'utilisateurs à générer
 
 SEXE_OPTIONS = ["M", "F"]
 ROLES = ["Student", "Teacher", "Librarian", "Admin"]  # rôles possibles
