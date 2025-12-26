@@ -82,7 +82,6 @@ export class BookService {
   ): Promise<PaginatedResponse<Book>> {
 
     const url = `${this.apiUrl}/advanced`;
-    console.log(url);
     
     let params = new HttpParams()
       .set('page', page)
@@ -105,6 +104,7 @@ export class BookService {
           params,
         })
       );
+      
       return data;
     } catch (error) {
       console.error('Erreur lors de la recherche avancée des livres', error);

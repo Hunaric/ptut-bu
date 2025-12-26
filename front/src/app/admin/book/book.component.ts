@@ -31,30 +31,29 @@ export class BookComponent implements OnInit {
 
   constructor(private bookService: BookService) {}
 
-  ngOnInit(): void {
+  ngOnInit(): void {    
     this.loadBooks();
   }
 
-  async loadBooks(): Promise<void> {
+async loadBooks(): Promise<void> {
+  console.log('Appel à loadBooks(), page actuelle :', this.page);
   this.loading = true;
-
   try {
-    // Appel au service pour récupérer les livres avec pagination
     const res: PaginatedResponse<Book> = await this.bookService.getBooksAdvanced(this.page, this.size);
-
-    // On met à jour les données
     this.books = res.items;
-    this.totalPages = res.pages;
-  } catch (error) {
-    if (error instanceof Error) {
-      alert('Erreur lors du chargement des livres : ' + error.message);
-    } else {
-      alert('Erreur lors du chargement des livres');
-    }
+    this.totalPages = Math.ceil(res.total / res.size);
+    this.page = res.page;
+    console.log("Lui");
+    
+  } catch (err) {
+    console.error('Erreur lors du chargement des livres', err);
   } finally {
+    console.log("MOi");
+    
     this.loading = false;
   }
 }
+
 
   nextPage() {
     if (this.page < this.totalPages) {
@@ -70,4 +69,10 @@ export class BookComponent implements OnInit {
     }
   }
 
+trackById(index: number, book: Book) {
+  return book.id;
 }
+
+
+}
+

@@ -1,20 +1,15 @@
-
-<app-page-breadcrumb pageTitle="Livres" />
+<app-page-breadcrumb pageTitle="Livres"></app-page-breadcrumb>
 
 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4 justify-items-center w-full">
-
-  @for (book of books; track book.id) {
-    <div class="flex justify-center w-full">
-      <app-card
-        class="mx-auto max-w-sm"
-        [title]="book.title"
-        [desc]="book.description"
-      >
-        <app-book-item [imageUrl]="book.cover_url" />
-      </app-card>
-    </div>
-  }
-
+  <div *ngFor="let book of books; trackBy: trackById" class="flex justify-center w-full">
+    <app-card
+      class="mx-auto max-w-sm"
+      [title]="book.title"
+      [desc]="book.description"
+    >
+      <app-book-item [imageUrl]="book.cover_url"></app-book-item>
+    </app-card>
+  </div>
 </div>
 
 <!-- Pagination -->

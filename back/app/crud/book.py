@@ -6,6 +6,8 @@ from typing import List
 from app.models.book import Book
 from app.models.tag import Tag
 from app.schemas.book import BookCreate, BookFilter, BookUpdate
+from app.schemas.pagination import PaginatedResponse
+from app.schemas.book import BookResponse   
 
 
 def get_books(db: Session):
@@ -130,12 +132,12 @@ def get_books_advanced(
         .all()
     )
 
-    return {
-        "total": total,
-        "page": page,
-        "size": size,
-        "items": books
-    }
+    return PaginatedResponse[BookResponse](
+        total=total,
+        page=page,
+        size=size,
+        items=[BookResponse.from_orm(b) for b in books]
+    )
 
 
 def get_book(db: Session, book_id: int):
