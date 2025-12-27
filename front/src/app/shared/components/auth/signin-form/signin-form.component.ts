@@ -55,20 +55,24 @@ export class SigninFormComponent {
         var password = this.loginForm.value.password;
 
         const res = await this.authService.onLogedIn(identifier, password);
-        // Vérifie si l'authentification a réussi
-        // alert('df')
         if (res && res.access_token) {
-          localStorage.setItem('accessToken', res.access_token);
-    
+          localStorage.setItem('access_token', res.access_token);
+          console.log(res);
+          
+          const me = await this.authService.getMe();
+          localStorage.setItem('user', JSON.stringify(me));
+          console.log('info :', me);
+          
+          
           // Navigation uniquement en cas de succès
-          this.router.navigate(['']).then(success => {
-            if (success) {
-              // // console.log('Navigation réussie vers home');
-              window.location.reload();
-            } else {
-              console.error('Échec de navigation');
-            }
-          });
+          // this.router.navigate(['']).then(success => {
+          //   if (success) {
+          //     // // console.log('Navigation réussie vers home');
+          //     window.location.reload();
+          //   } else {
+          //     console.error('Échec de navigation');
+          //   }
+          // });
         } else {
           console.error('Authentification échouée :', res.detail || 'Réponse invalide');
           this.error = res.detail;

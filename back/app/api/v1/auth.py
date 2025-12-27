@@ -1,6 +1,7 @@
 # app/api/v1/auth.py
 from app.core.auth import create_access_token
 from app.core.database import get_db
+from app.core.dependencies import get_current_user
 from app.crud.user import get_user_by_identifier
 
 from passlib.context import CryptContext
@@ -28,6 +29,38 @@ def user_login(login_in: LoginRequest, db: Session = Depends(get_db)):
     # sub = id du client
     access_token = create_access_token(data={"sub": str(user.id)})
     return {"access_token": access_token, "token_type": "bearer"}
+
+    
+@router.get("/me")
+def get_me(
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    # Récupérer le rôle (s'il existe)
+    role = current_user.role
+
+    # Récupérer les permissions provenant du rôle
+    role_permissions = {perm.name for perm in role.permissions} if role else set()
+
+    # Récupérer les permissions directes de l'utilisateur
+    user_permissions = {perm.name for perm in current_user.permissions}
+
+    # Fusionner toutes les permissions
+    all_permissions = role_permissions | user_permissions
+
+    # Si superuser, on peut ajouter un flag ou toutes les permissions
+    if current_user.is_superuser:
+        all_permissions.add("superuser")  # ou mettre un flag spécifique
+
+    return {
+        # "id": current_user.id,
+        "username": current_user.username,
+        "email": current_user.email,
+        "role": role.name if role else None,
+        "permissions": list(all_permissions)
+    }
+
+
 
 
 @router.post("/register", response_model=TokenResponse)

@@ -15,7 +15,7 @@ export class AuthService {
   }
 
   get accessToken(): string | null {
-    return localStorage.getItem('accessToken');
+    return localStorage.getItem('access_token');
   }
   
   getToken(): string | null {
@@ -80,24 +80,21 @@ export class AuthService {
   }
 
 
-  // Récupérer l'utilisateur courant avec HttpClient
-  // async readCurrentUser(): Promise<Client> {
-  //   const url = `${this.apiUrl}/clients/me`;
-  //   try {
-  //     const client = await firstValueFrom(
-  //       this.http.get<Client>(url, {
-  //         headers: new HttpHeaders({
-  //           'Accept': 'application/json',
-  //           'Authorization': `Bearer ${this.accessToken}`
-  //         })
-  //       })
-  //     );
-  //     return client;
-  //   } catch (error) {
-  //     console.error(error);
-  //     throw error;
-  //   }
-  // }
+async getMe(): Promise<any> {
+  const token = localStorage.getItem('access_token');
+  if (!token) throw new Error('No access token');
+
+  const res = await fetch(`${this.apiUrl}/auth/me`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json'
+    }
+  });
+  
+  if (!res.ok) throw new Error('Impossible de récupérer les infos utilisateur');
+  return res.json();
+}
+
 
   
   forgotPassword(email: string) {
