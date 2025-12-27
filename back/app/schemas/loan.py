@@ -3,6 +3,15 @@ from pydantic import BaseModel
 from datetime import date
 from typing import Optional, List
 from uuid import UUID
+from enum import Enum
+
+class LoanStatus(str, Enum):
+    requested = "requested"
+    approved = "approved"
+    ongoing = "ongoing"
+    returned = "returned"
+    late = "late"
+
 
 # --------------------------
 # Input pour créer un prêt
@@ -54,4 +63,4 @@ class LoanFilter(BaseModel):
 
 
 class LoanUpdateStatus(BaseModel):
-    status: Literal["requested", "approved", "ongoing", "returned", "late"]
+    status: LoanStatus

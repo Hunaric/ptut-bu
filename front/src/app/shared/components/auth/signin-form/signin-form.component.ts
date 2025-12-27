@@ -65,14 +65,14 @@ export class SigninFormComponent {
           
           
           // Navigation uniquement en cas de succès
-          // this.router.navigate(['']).then(success => {
-          //   if (success) {
-          //     // // console.log('Navigation réussie vers home');
-          //     window.location.reload();
-          //   } else {
-          //     console.error('Échec de navigation');
-          //   }
-          // });
+          this.router.navigate(['']).then(success => {
+            if (success) {
+              // // console.log('Navigation réussie vers home');
+              window.location.reload();
+            } else {
+              console.error('Échec de navigation');
+            }
+          });
         } else {
           console.error('Authentification échouée :', res.detail || 'Réponse invalide');
           this.error = res.detail;

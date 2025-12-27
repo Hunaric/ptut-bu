@@ -1,6 +1,6 @@
 import uuid
 from app.schemas.pagination import PaginatedResponse
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Body
 from sqlalchemy.orm import Session
 from app.crud import loan as crud
 from app.schemas.loan import LoanCreate, LoanResponse, LoanFilter, LoanUpdateStatus
@@ -113,7 +113,6 @@ def search_loans(
     return crud.query_loans(db, filters)
 
 
-
 @router.patch(
     "/{loan_id}/status",
     response_model=LoanResponse,
@@ -121,8 +120,7 @@ def search_loans(
 )
 def update_loan_status(
     loan_id: int,
-    update: LoanUpdateStatus,
+    update: LoanUpdateStatus = Body(..., example={"status": "approved"}),
     db: Session = Depends(get_db)
 ):
     return crud.update_loan_status(db, loan_id, update.status)
-

@@ -6,7 +6,7 @@
     </div>
     <div class="flex items-end justify-between mt-5">
       <div>
-        <span class="text-sm text-gray-500 dark:text-gray-400">Total Books</span>
+        <span class="text-sm text-gray-500 dark:text-gray-400">Total des livres</span>
         <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{{ metrics?.total_books }}</h4>
       </div>
       <app-badge color="success">
@@ -22,7 +22,7 @@
     </div>
     <div class="flex items-end justify-between mt-5">
       <div>
-        <span class="text-sm text-gray-500 dark:text-gray-400">Total Loans</span>
+        <span class="text-sm text-gray-500 dark:text-gray-400">Total des emprunts pour {{year}}</span>
         <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{{ metrics!.total_loans }}</h4>
       </div>
       <app-badge [color]="metrics!.active_loans > 0 ? 'warning' : 'success'">
@@ -38,7 +38,7 @@
     </div>
     <div class="flex items-end justify-between mt-5">
       <div>
-        <span class="text-sm text-gray-500 dark:text-gray-400">Late Loans</span>
+        <span class="text-sm text-gray-500 dark:text-gray-400">Retard observe en {{year}}</span>
         <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{{ metrics!.late_loans }}</h4>
       </div>
       <app-badge [color]="metrics!.late_loans > 0 ? 'error' : 'success'">
@@ -54,7 +54,7 @@
     </div>
     <div class="flex items-end justify-between mt-5">
       <div>
-        <span class="text-sm text-gray-500 dark:text-gray-400">On-Time Returns</span>
+        <span class="text-sm text-gray-500 dark:text-gray-400">Retour de livres ponctuel pour {{year}}</span>
         <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{{ metrics?.return_rate }}%</h4>
       </div>
       <app-badge color="success">

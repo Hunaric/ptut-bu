@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.models.loan import Loan
 from app.models.user import User
 from app.models.book import Book
-from app.schemas.loan import LoanCreate, LoanFilter
+from app.schemas.loan import LoanCreate, LoanFilter, LoanStatus
 import uuid
 from datetime import date, timedelta
 
@@ -113,7 +113,7 @@ def return_loan(db: Session, loan_id: int):
     loan.book_quantity = book.quantity
     return loan
 
-def update_loan_status(db: Session, loan_id: int, new_status: str):
+def update_loan_status(db: Session, loan_id: int, new_status: LoanStatus):
     loan = db.query(Loan).filter(Loan.id == loan_id).first()
     if not loan:
         raise HTTPException(404, "Loan not found")
@@ -122,19 +122,17 @@ def update_loan_status(db: Session, loan_id: int, new_status: str):
     if not book:
         raise HTTPException(404, "Book not found")
 
-    # Gérer la logique selon le nouveau status
-    if new_status == "approved":
+    # logique selon le nouveau status
+    if new_status == LoanStatus.approved:
         if book.quantity <= 0:
             raise HTTPException(400, "No copies available for this book")
         book.quantity -= 1
         loan.loan_date = date.today()
         loan.due_date = date.today() + timedelta(days=14)
-
-    elif new_status in ["returned", "late"]:
+    elif new_status in [LoanStatus.returned, LoanStatus.late]:
         book.quantity += 1
         loan.return_date = date.today()
 
-    # Mettre à jour le status
     loan.status = new_status
     loan.book_quantity = book.quantity
 
