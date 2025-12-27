@@ -1,9 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, forwardRef } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'app-input-field',
   imports: [CommonModule],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => InputFieldComponent),
+      multi: true
+    }
+  ],
   template: `
     <div class="relative">
       <input
@@ -33,7 +41,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
     </div>
   `,
 })
-export class InputFieldComponent {
+export class InputFieldComponent implements ControlValueAccessor {
 
   @Input() type: string = 'text';
   @Input() id?: string = '';
@@ -68,6 +76,29 @@ export class InputFieldComponent {
 
   onInput(event: Event) {
     const input = event.target as HTMLInputElement;
-    this.valueChange.emit(this.type === 'number' ? +input.value : input.value);
+    const value = this.type === 'number' ? +input.value : input.value;
+this.value = value;
+this.onChange(value); // 🔥 lien avec formControlName
+
   }
+  // Fonctions fournies par Angular Forms
+private onChange: (value: any) => void = () => {};
+private onTouched: () => void = () => {};
+
+writeValue(value: any): void {
+  this.value = value ?? '';
+}
+
+registerOnChange(fn: any): void {
+  this.onChange = fn;
+}
+
+registerOnTouched(fn: any): void {
+  this.onTouched = fn;
+}
+
+setDisabledState(isDisabled: boolean): void {
+  this.disabled = isDisabled;
+}
+
 }

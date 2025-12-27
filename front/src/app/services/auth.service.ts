@@ -26,20 +26,19 @@ export class AuthService {
   logout(): void {
     localStorage.clear();
     // console.log("Déconnexion effectuée");
-    this.router.navigate(['/auth']);
+    this.router.navigate(['/signin']);
   }
 
   notifySessionExpired(): void {
-    // alert('Sitzung abgelaufen. Bitte melden Sie sich erneut an.');
     this.logout();
   }
   
-  async onLogedIn(email: string, password: string): Promise<any> {
-    const url = `${this.apiUrl}/client/login`;
+  async onLogedIn(identifier: string, password: string): Promise<any> {
+    const url = `${this.apiUrl}/auth/login`;
     const options = {
       method: 'POST',
       headers: {'Content-Type': 'application/json', Accept: 'application/json'},
-      body: '{"email":"'+email+'","password":"'+password+'"}'
+      body: '{"identifier":"'+identifier+'","password":"'+password+'"}'
     };
 
     try {
@@ -47,7 +46,7 @@ export class AuthService {
       const data = await response.json();
 
     if (response.ok && data.accessToken) {
-      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('access_token', data.accessToken);
     }
       // // console.log(data);
       return data ?? [];
