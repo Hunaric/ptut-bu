@@ -54,7 +54,7 @@ async loadLateLoans() {
 
   const lateEvents: CalendarEvent[] = lateLoans.map(loan => ({
     id: loan.id.toString(),
-    title: `${loan.book_title} en retard`,
+    title: `${loan.book_title} (en retard)`,
     start: new Date(loan.due_date).toISOString().split('T')[0], // format ISO
     extendedProps: { calendar: 'Danger' }
   }));

@@ -6,6 +6,6 @@ export interface DashboardStats {
     total_loans: number;
     active_loans: number;
     late_loans: number;
-  on_time_return_rate: number;
+    return_rate: number;
   };
 }
