@@ -13,19 +13,19 @@ OPENLIBRARY_SEARCH_URL = "https://openlibrary.org/search.json"
 OPENLIBRARY_WORK_URL = "https://openlibrary.org{work_key}.json"
 
 BATCH_SIZE = 100
-MIN_BOOKS_PER_CATEGORY = 50
+MIN_BOOKS_PER_CATEGORY = 100
 
 # Liste de catégories avec requête associée
 QUERIES = {
-    # "Science Fiction": "science fiction",
-    # "Fantasy": "fantasy",
-    # "Romance": "romance",
-    # "Thriller": "thriller",
-    # "Mystery": "mystery",
-    # "History": "history",
-    # "Biography": "biography",
-    # "Horror": "horror",
-    # "Children": "children",
+    "Science Fiction": "science fiction",
+    "Fantasy": "fantasy",
+    "Romance": "romance",
+    "Thriller": "thriller",
+    "Mystery": "mystery",
+    "History": "history",
+    "Biography": "biography",
+    "Horror": "horror",
+    "Children": "children",
     "Young Adult": "young adult",
 }
 

@@ -37,17 +37,17 @@ export const routes: Routes = [
   {
     path:'signin',
     component:SignInComponent,
-    title:'Sign In Dashboard'
+    title:'Sign In'
   },
   {
     path:'signup',
     component:SignUpComponent,
-    title:'Sign Up Dashboard'
+    title:'Sign Up'
   },
   // error pages
   {
     path:'**',
     component:NotFoundComponent,
-    title:'NotFound Dashboard'
+    title:'NotFound'
   },
 ];

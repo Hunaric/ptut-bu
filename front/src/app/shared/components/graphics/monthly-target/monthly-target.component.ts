@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import {
   ApexNonAxisChartSeries,
   ApexChart,
@@ -22,8 +22,15 @@ import { DropdownItemComponent } from '../../ui/dropdown/dropdown-item/dropdown-
   ],
   templateUrl: './monthly-target.component.html',
 })
-export class MonthlyTargetComponent {
-  public series: ApexNonAxisChartSeries = [75.55];
+export class MonthlyTargetComponent implements OnChanges{
+
+  @Input() value?: number;
+
+  public series: ApexNonAxisChartSeries = [];
+
+  ngOnChanges() {
+    this.series = [this.value ?? 0];
+  }
   public chart: ApexChart = {
     fontFamily: 'Outfit, sans-serif',
     type: 'radialBar',

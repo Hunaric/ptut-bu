@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { NgApexchartsModule, ApexAxisChartSeries, ApexChart, ApexXAxis, ApexPlotOptions, ApexDataLabels, ApexStroke, ApexLegend, ApexYAxis, ApexGrid, ApexFill, ApexTooltip } from 'ng-apexcharts';
+import { StatsService } from '../../../../services/stats.service';
 
 
 @Component({
@@ -12,12 +13,20 @@ import { NgApexchartsModule, ApexAxisChartSeries, ApexChart, ApexXAxis, ApexPlot
   templateUrl: './monthly-chart.component.html',
   styleUrl: './monthly-chart.component.css'
 })
-export class MonthlyChartComponent {
+export class MonthlyChartComponent implements OnChanges {
 
+  @Input() data?: number[] = [];
+
+  constructor(private statsService: StatsService) {}
+
+  ngOnChanges() {
+    this.series = [{ name: 'Emprunts', data: this.data ?? [] }];
+  }
+  
   public series: ApexAxisChartSeries = [
     {
       name: 'Emprunt',
-      data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
+      data: [],
     },
   ];
   public chart: ApexChart = {
@@ -62,6 +71,7 @@ export class MonthlyChartComponent {
     y: { formatter: (val: number) => `${val}` },
   };
   public colors: string[] = ['#465fff'];
+
 
   isOpen = false;
 
