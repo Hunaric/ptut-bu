@@ -1,3 +1,11 @@
+<div class="flex items-center gap-2 mb-4">
+  <label for="year-select">Année:</label>
+  <select id="year-select" [(ngModel)]="selectedYear" (change)="onYearChange()">
+    <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+  </select>
+</div>
+
+
 <div *ngIf="stats" class="grid grid-cols-12 gap-4 md:gap-6">
   <div class="col-span-12 space-y-6 xl:col-span-7">
     <div><app-monthly-chart [data]="stats.loans_by_month"/></div>

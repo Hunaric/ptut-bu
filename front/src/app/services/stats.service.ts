@@ -12,10 +12,8 @@ export class StatsService {
   private apiUrl = `${environment.apiUrl}/stats/dashboard`;
 
   constructor(private http: HttpClient) {}
+async getDashboardStats(year: number = new Date().getFullYear()): Promise<any> {
+  return firstValueFrom(this.http.get(`${this.apiUrl}?year=${year}`));
+}
 
-  async getDashboardStats(): Promise<DashboardStats> {
-    return firstValueFrom(
-    this.http.get<DashboardStats>(this.apiUrl)
-  );
-  }
 }

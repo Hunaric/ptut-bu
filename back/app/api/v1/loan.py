@@ -7,6 +7,8 @@ from app.schemas.loan import LoanCreate, LoanResponse, LoanFilter, LoanUpdateSta
 from app.core.dependencies import require_admin, require_permission, require_superuser, get_current_user, require_any_permission
 from app.core.database import get_db
 from app.models.user import User
+from datetime import date
+from app.models.loan import Loan
 
 router = APIRouter(prefix="/loans", tags=["Loans"])
 
@@ -23,6 +25,25 @@ def create_loan_route(
     # Utiliser current_user.id comme user_id
     return crud.create_loan(db, data, current_user.id)
 
+
+
+@router.get("/late")
+def get_late_loans(db: Session = Depends(get_db)):
+    today = date.today()
+    loans = db.query(Loan).filter(
+        Loan.return_date.is_(None),
+        Loan.due_date < today
+    ).all()
+
+    return [
+        {
+            "id": loan.id,
+            "book_title": loan.book.title,
+            "due_date": loan.due_date.isoformat(),
+            "borrower_name": getattr(loan.borrower, "name", None)
+        }
+        for loan in loans
+    ]
 
 @router.get("/{loan_id}", response_model=LoanResponse)
 def read_loan(loan_id: int, db: Session = Depends(get_db)):

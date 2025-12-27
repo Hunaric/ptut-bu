@@ -7,6 +7,7 @@ import { MetricsComponent } from '../../shared/components/graphics/metrics/metri
 import { DashboardStats } from '../../interfaces/dashboard-stats';
 import { StatsService } from '../../services/stats.service';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,15 +15,25 @@ import { CommonModule } from '@angular/common';
     MonthlyChartComponent,
     MonthlyTargetComponent,
     MetricsComponent,
-    CommonModule
+    CommonModule, 
+    FormsModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit{
   calendarOptions!: CalendarOptions;
+  years: number[] = [2025, 2024, 2023, 2022, 2021, 2020];
 
   stats!: DashboardStats;
+  async onYearChange() {
+    await this.loadStats();
+}
+
+  private async loadStats() {
+    this.stats = await this.statsService.getDashboardStats(this.selectedYear);
+  }
+selectedYear: number = new Date().getFullYear();
 
   constructor(private statsService: StatsService) {}
 

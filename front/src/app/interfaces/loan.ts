@@ -28,3 +28,10 @@ export interface LoanFilter {
   start_date?: string;
   end_date?: string;
 }
+
+export interface LoanCalendar {
+  id: number;
+  book_title: string;
+  due_date: string;
+  borrower_name?: string;
+}
