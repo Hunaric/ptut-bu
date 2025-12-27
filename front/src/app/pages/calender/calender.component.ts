@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
 
@@ -9,6 +9,8 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { ModalComponent } from '../../shared/components/ui/modal/modal.component';
 import { KeyValuePipe } from '@angular/common';
+import { LoanService } from '../../services/loan.service';
+import { LoanCalendar } from '../../interfaces/loan';
 
 
 interface CalendarEvent extends EventInput {
@@ -28,10 +30,66 @@ interface CalendarEvent extends EventInput {
   templateUrl: './calender.component.html',
   styleUrl: './calender.component.css'
 })
-export class CalenderComponent {
+export class CalenderComponent implements OnInit {
 
   @ViewChild('calendar') calendarComponent!: FullCalendarComponent;
 
+  constructor(private loanService: LoanService) {}
+async ngOnInit() {
+  await this.loadLateLoans();
+
+  this.calendarOptions = {
+    ...this.calendarOptions,
+    headerToolbar: {
+      left: 'prev,next addEventButton',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    },
+    events: this.events
+  };
+}
+
+async loadLateLoans() {
+  const lateLoans: LoanCalendar[] = await this.loanService.getLateLoans();
+
+  const lateEvents: CalendarEvent[] = lateLoans.map(loan => ({
+    id: loan.id.toString(),
+    title: `${loan.book_title} en retard`,
+    start: new Date(loan.due_date).toISOString().split('T')[0], // format ISO
+    extendedProps: { calendar: 'Danger' }
+  }));
+
+  this.events = [...lateEvents];
+
+  // mise à jour de calendarOptions pour trigger rerender
+  this.calendarOptions = {
+    ...this.calendarOptions,
+    events: [...this.events]
+  };
+}
+
+
+    calendarOptions: CalendarOptions = {
+      plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+      initialView: 'dayGridMonth',
+      headerToolbar: {
+        left: 'prev,next addEventButton',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+      selectable: true,
+      events: [],
+      select: (info) => this.handleDateSelect(info),
+      eventClick: (info) => this.handleEventClick(info),
+      customButtons: {
+        addEventButton: {
+          text: 'Ajouter un evenement +',
+          click: () => this.openModal()
+        }
+      },
+      eventContent: (arg) => this.renderEventContent(arg)
+    };
+  
   events: CalendarEvent[] = [];
   selectedEvent: CalendarEvent | null = null;
   eventTitle = '';
@@ -47,52 +105,8 @@ export class CalenderComponent {
     Warning: 'warning'
   };
 
-  calendarOptions!: CalendarOptions;
 
-  ngOnInit() {
-    this.events = [
-      {
-        id: '1',
-        title: 'Event Conf.',
-        start: new Date().toISOString().split('T')[0],
-        extendedProps: { calendar: 'Danger' }
-      },
-      {
-        id: '2',
-        title: 'Meeting',
-        start: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-        extendedProps: { calendar: 'Success' }
-      },
-      {
-        id: '3',
-        title: 'Workshop',
-        start: new Date(Date.now() + 172800000).toISOString().split('T')[0],
-        end: new Date(Date.now() + 259200000).toISOString().split('T')[0],
-        extendedProps: { calendar: 'Primary' }
-      }
-    ];
 
-    this.calendarOptions = {
-      plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-      initialView: 'dayGridMonth',
-      headerToolbar: {
-        left: 'prev,next addEventButton',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay'
-      },
-      selectable: true,
-      events: this.events,
-      select: (info) => this.handleDateSelect(info),
-      eventClick: (info) => this.handleEventClick(info),
-      customButtons: {
-        addEventButton: {
-          text: 'Add Event +',
-          click: () => this.openModal()
-        }
-      },
-      eventContent: (arg) => this.renderEventContent(arg)
-    };
-  }
 
   handleDateSelect(selectInfo: DateSelectArg) {
     this.resetModalFields();
