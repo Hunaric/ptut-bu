@@ -49,43 +49,59 @@ def loans_by_month(db: Session, year: int):
 
     return data
 
-def on_time_return_rate(db: Session):
+def on_time_return_rate(db: Session, year: int):
+    # Total des prêts retournés dans l'année
     total_returns = db.query(func.count(Loan.id)) \
-        .filter(Loan.return_date.isnot(None)) \
-        .scalar()
+        .filter(
+            extract("year", Loan.loan_date) == year,
+            Loan.return_date.isnot(None)
+        ).scalar()
 
     if total_returns == 0:
         return 0
 
     on_time = db.query(func.count(Loan.id)) \
         .filter(
+            extract("year", Loan.loan_date) == year,
             Loan.return_date.isnot(None),
             Loan.return_date <= Loan.due_date
         ).scalar()
 
     return round((on_time / total_returns) * 100, 2)
 
-def metrics(db: Session):
+def metrics(db: Session, year: int):
     today = date.today()
 
+    # Filtrer les loans sur l'année
+    total_loans = db.query(func.count(Loan.id)) \
+        .filter(extract("year", Loan.loan_date) == year) \
+        .scalar()
+
+    active_loans = db.query(func.count(Loan.id)) \
+        .filter(
+            extract("year", Loan.loan_date) == year,
+            Loan.return_date.is_(None)
+        ).scalar()
+
+    late_loans = db.query(func.count(Loan.id)) \
+        .filter(
+            extract("year", Loan.loan_date) == year,
+            Loan.return_date.is_(None),
+            Loan.due_date < today
+        ).scalar()
+
     return {
-        "total_books": db.query(func.count(Book.id)).scalar(),
-        "total_loans": db.query(func.count(Loan.id)).scalar(),
-        "active_loans": db.query(func.count(Loan.id))
-            .filter(Loan.return_date.is_(None))
-            .scalar(),
-        "late_loans": db.query(func.count(Loan.id))
-            .filter(
-                Loan.return_date.is_(None),
-                Loan.due_date < today
-            )
-            .scalar(),
+        "total_books": db.query(func.count(Book.id)).scalar(),  # livres totaux restent globaux
+        "total_loans": total_loans,
+        "active_loans": active_loans,
+        "late_loans": late_loans,
+        "return_rate": on_time_return_rate(db, year)
     }
 
 @router.get("/dashboard")
 def dashboard_stats(year: int = date.today().year, db: Session = Depends(get_db)):
     return {
         "loans_by_month": loans_by_month(db, year),
-        "on_time_return_rate": on_time_return_rate(db),
-        "metrics": metrics(db)
+        "on_time_return_rate": on_time_return_rate(db, year),
+        "metrics": metrics(db, year)
     }

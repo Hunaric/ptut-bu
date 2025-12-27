@@ -17,6 +17,7 @@ export class MetricsComponent {
   total_loans: number;
   active_loans: number;
   late_loans: number;
+  on_time_return_rate: number;
 };
 
   public icons = {
