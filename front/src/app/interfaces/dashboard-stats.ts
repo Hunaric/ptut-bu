@@ -1,4 +1,5 @@
 export interface DashboardStats {
+  scope: 'global' | 'user';
   loans_by_month: number[];
   on_time_return_rate: number;
   metrics: {

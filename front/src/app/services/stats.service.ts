@@ -9,13 +9,32 @@ import { DashboardStats } from '../interfaces/dashboard-stats';
 })
 export class StatsService {
 
-  private apiUrl = `${environment.apiUrl}/stats/dashboard`;
+  private apiUrl = `${environment.apiUrl}/stats/user/dashboard`;
+
+  get accessToken(): string | null {
+    return localStorage.getItem('access_token');
+  }
+  
 
   constructor(private http: HttpClient) {}
-async getDashboardStats(year: number = new Date().getFullYear()): Promise<DashboardStats> {
+  
+  async getDashboardStats(
+  year: number = new Date().getFullYear()
+): Promise<DashboardStats> {
+
+  const token = this.accessToken;
+
   return firstValueFrom(
-    this.http.get<DashboardStats>(`${this.apiUrl}?year=${year}`)
+    this.http.get<DashboardStats>(
+      `${this.apiUrl}?year=${year}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
   );
 }
+
 
 }

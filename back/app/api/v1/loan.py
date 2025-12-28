@@ -7,7 +7,7 @@ from app.schemas.loan import LoanCreate, LoanResponse, LoanFilter, LoanUpdateSta
 from app.core.dependencies import require_admin, require_permission, require_superuser, get_current_user, require_any_permission
 from app.core.database import get_db
 from app.models.user import User
-from datetime import date
+from datetime import date, timedelta
 from app.models.loan import Loan
 
 router = APIRouter(prefix="/loans", tags=["Loans"])
@@ -27,13 +27,27 @@ def create_loan_route(
 
 
 
-@router.get("/late")
-def get_late_loans(db: Session = Depends(get_db)):
+# @router.get("/late")
+def get_late_loans(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
     today = date.today()
-    loans = db.query(Loan).filter(
-        Loan.return_date.is_(None),
-        Loan.due_date < today
-    ).all()
+
+    # ADMIN / STAFF → tous les retards
+    if current_user.has_permission("loan:manage", "loan:view_all"):
+        loans = db.query(Loan).filter(
+            Loan.return_date.is_(None),
+            Loan.due_date < today
+        ).all()
+
+    # USER → seulement ses retards
+    else:
+        loans = db.query(Loan).filter(
+            Loan.return_date.is_(None),
+            Loan.due_date < today,
+            Loan.user_id == current_user.id
+        ).all()
 
     return [
         {
@@ -44,6 +58,47 @@ def get_late_loans(db: Session = Depends(get_db)):
         }
         for loan in loans
     ]
+
+from datetime import timedelta
+
+@router.get("/late")
+def get_late_and_upcoming_loans(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+    days_ahead: int = 30  # configurable depuis l'URL
+):
+    today = date.today()
+    upcoming_limit = today + timedelta(days=days_ahead)
+
+    # ADMIN / STAFF → tous les prêts
+    if current_user.has_permission("loan:manage", "loan:view_all"):
+        loans = db.query(Loan).filter(
+            Loan.return_date.is_(None),
+            Loan.due_date <= upcoming_limit  # inclut les retards et les prêts à rendre bientôt
+        ).all()
+
+    # USER → seulement ses prêts
+    else:
+        loans = db.query(Loan).filter(
+            Loan.return_date.is_(None),
+            Loan.due_date <= upcoming_limit,
+            Loan.user_id == current_user.id
+        ).all()
+
+    # Retour structuré : on peut ajouter un flag "status"
+    result = []
+    for loan in loans:
+        status = "late" if loan.due_date < today else "upcoming"
+        result.append({
+            "id": loan.id,
+            "book_title": loan.book.title,
+            "due_date": loan.due_date.isoformat(),
+            "borrower_name": getattr(loan.borrower, "name", None),
+            "status": status
+        })
+
+    return result
+
 
 @router.get("/{loan_id}", response_model=LoanResponse)
 def read_loan(loan_id: int, db: Session = Depends(get_db)):

@@ -32,6 +32,7 @@ export class DashboardComponent implements OnInit{
 
   private async loadStats() {
     this.stats = await this.statsService.getDashboardStats(this.selectedYear);
+    
   }
 selectedYear: number = new Date().getFullYear();
 
@@ -39,6 +40,7 @@ selectedYear: number = new Date().getFullYear();
 
 async ngOnInit() {
   this.stats = await this.statsService.getDashboardStats();
+    console.log(this.stats);
 }
 
 

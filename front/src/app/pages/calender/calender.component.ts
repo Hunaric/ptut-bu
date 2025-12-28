@@ -50,24 +50,45 @@ async ngOnInit() {
 }
 
 async loadLateLoans() {
-  const lateLoans: LoanCalendar[] = await this.loanService.getLateLoans();
+  const loans: LoanCalendar[] = await this.loanService.getLateLoans();
 
-  const lateEvents: CalendarEvent[] = lateLoans.map(loan => ({
-    id: loan.id.toString(),
-    title: `${loan.book_title} (en retard)`,
-    start: new Date(loan.due_date).toISOString().split('T')[0], // format ISO
-    extendedProps: { calendar: 'Danger' }
-  }));
+  const today = new Date();
+  const warningDays = 7; // nombre de jours pour considérer “à rendre bientôt”
 
-  this.events = [...lateEvents];
+  const events: CalendarEvent[] = loans.map(loan => {
+    const dueDate = new Date(loan.due_date);
+    let calendarLevel = '';
+    let titleSuffix = '';
 
-  // mise à jour de calendarOptions pour trigger rerender
+    if (dueDate < today) {
+      // en retard
+      calendarLevel = 'Danger';
+      titleSuffix = 'en retard';
+    } else if (dueDate <= new Date(today.getTime() + warningDays * 24 * 60 * 60 * 1000)) {
+      // à rendre bientôt
+      calendarLevel = 'Warning';
+      titleSuffix = 'à rendre bientôt';
+    } else {
+      calendarLevel = 'Success';
+      titleSuffix = '';
+    }
+
+    return {
+      id: loan.id.toString(),
+      title: `${loan.book_title}${titleSuffix ? ' (' + titleSuffix + ')' : ''}`,
+      start: dueDate.toISOString().split('T')[0],
+      extendedProps: { calendar: calendarLevel }
+    };
+  });
+
+  this.events = [...events];
+
+  // trigger rerender du calendrier
   this.calendarOptions = {
     ...this.calendarOptions,
     events: [...this.events]
   };
 }
-
 
     calendarOptions: CalendarOptions = {
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
