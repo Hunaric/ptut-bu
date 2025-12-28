@@ -79,7 +79,7 @@ def read_user_loans(
 @router.post(
     "/{loan_id}/approve",
     response_model=LoanResponse,
-    dependencies=[Depends(require_permission("loan:manage"))]
+    dependencies=[Depends(require_any_permission("loan:manage", "loan:approve", "loan:return"))]
 )
 def approve_loan_route(
     loan_id: int,
@@ -92,7 +92,7 @@ def approve_loan_route(
 @router.post(
     "/{loan_id}/return",
     response_model=LoanResponse,
-    dependencies=[Depends(require_permission("loan:return"))]
+    dependencies=[Depends(require_any_permission("loan:return", "loan:manage", "loan:approve"))]
 )
 def return_loan_route(
     loan_id: int,
@@ -116,7 +116,7 @@ def search_loans(
 @router.patch(
     "/{loan_id}/status",
     response_model=LoanResponse,
-    dependencies=[Depends(require_permission("loan:manage"))]
+    dependencies=[Depends(require_any_permission("loan:manage", "loan:approve", "loan:return"))]
 )
 def update_loan_status(
     loan_id: int,

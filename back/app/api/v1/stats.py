@@ -5,6 +5,8 @@ from app.core.database import get_db
 from app.models.book import Book
 from app.models.loan import Loan
 from datetime import date
+from app.crud.loan import get_user_loans
+from app.core.dependencies import require_admin, require_permission, require_superuser, get_current_user, require_any_permission
 
 
 router = APIRouter(prefix="/stats", tags=["Stats"])
@@ -48,6 +50,7 @@ def loans_by_month(db: Session, year: int):
         data[int(month) - 1] = count
 
     return data
+
 def on_time_return_rate_global(db: Session):
     total_returns = db.query(func.count(Loan.id)) \
         .filter(Loan.return_date.isnot(None)) \
@@ -112,10 +115,30 @@ def metrics(db: Session, year: int):
         "return_rate": on_time_return_rate_by_year(db, year)
     }
 
-@router.get("/dashboard")
+@router.get(
+    "/dashboard",
+    dependencies=[Depends(require_any_permission("loan:manage", "loan:view_all"))]
+)
 def dashboard_stats(year: int = date.today().year, db: Session = Depends(get_db)):
     return {
         "loans_by_month": loans_by_month(db, year),
         "on_time_return_rate": on_time_return_rate_global(db),
         "metrics": metrics(db, year)
+    }
+
+@router.get("/user/{user_id}/loans", dependencies=[Depends(require_any_permission("loan:view_own", "loan:view_all"))])
+def user_loan_stats(user_id: int, db: Session = Depends(get_db)):
+    loans = get_user_loans(db, user_id)
+    total_loans = len(loans)
+    if total_loans == 0:
+        return {
+            "total_loans": 0,
+            "on_time_return_rate": 0
+        }
+
+    on_time_returns = sum(1 for loan in loans if loan.return_date and loan.return_date <= loan.due_date)
+
+    return {
+        "total_loans": total_loans,
+        "on_time_return_rate": round((on_time_returns / total_loans) * 100, 2)
     }

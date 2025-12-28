@@ -7,7 +7,7 @@ from app.models.user import User as UserModel
 from app.core.database import get_db
 from app.schemas.user import UserCreate, User, UserUpdate
 from app.schemas.account import AccountUpdate
-from app.crud.user import create_user_with_account, update_user, get_user, assign_permission_to_user, remove_permission_from_user
+from app.crud.user import create_user_with_account, update_user, get_user, assign_permission_to_user, remove_permission_from_user, get_user_by_identifier, get_user_by_email
 from app.crud.account import update_account
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -17,6 +17,24 @@ router = APIRouter(prefix="/users", tags=["Users"])
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return create_user_with_account(db, user)
     
+
+# GET all users
+@router.get("/", response_model=List[User])
+def list_users(
+    skip: int = Query(0, ge=0, description="Nombre d'utilisateurs à sauter"),
+    limit: int = Query(50, le=200, description="Nombre maximum d'utilisateurs à retourner"),
+    db: Session = Depends(get_db)
+):
+    """
+    Récupère la liste des utilisateurs.
+    Paramètres:
+    - skip: nombre d'utilisateurs à sauter (pagination)
+    - limit: nombre maximum d'utilisateurs à retourner
+    """
+    users = db.query(UserModel).offset(skip).limit(limit).all()
+    return users
+
+
 # UPDATE User + Account
 @router.put("/{user_id}", response_model=User)
 def update_user_info(user_id: int, updates: UserUpdate, db: Session = Depends(get_db)):
@@ -51,18 +69,17 @@ def remove_permission_from_user_endpoint(user_id: str, permission_id: int, db: S
     user = remove_permission_from_user(db, user_id, permission_id)
     return user
 
-# GET all users
-@router.get("/", response_model=List[User])
-def list_users(
-    skip: int = Query(0, ge=0, description="Nombre d'utilisateurs à sauter"),
-    limit: int = Query(50, le=200, description="Nombre maximum d'utilisateurs à retourner"),
-    db: Session = Depends(get_db)
-):
-    """
-    Récupère la liste des utilisateurs.
-    Paramètres:
-    - skip: nombre d'utilisateurs à sauter (pagination)
-    - limit: nombre maximum d'utilisateurs à retourner
-    """
-    users = db.query(UserModel).offset(skip).limit(limit).all()
-    return users
+
+@router.get("/{identifier}", response_model=User)
+def get_unique_user(identifier: str, db: Session = Depends(get_db)):
+    user = get_user_by_identifier(db, identifier)
+    if not user:
+        raise HTTPException(404, "User not found")
+    return user
+
+@router.get("/{email}", response_model=User)
+def get_user_by_email_endpoint(email: str, db: Session = Depends(get_db)):
+    user = get_user_by_email(db, email)
+    if not user:
+        raise HTTPException(404, "User not found")
+    return user
