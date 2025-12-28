@@ -43,14 +43,16 @@ export class AuthService {
       headers: {'Content-Type': 'application/json', Accept: 'application/json'},
       body: '{"identifier":"'+identifier+'","password":"'+password+'"}'
     };
-
+    
     try {
       const response = await fetch(url, options);
+      console.log('OK');
+      
       const data = await response.json();
-
-    if (response.ok && data.accessToken) {
-      localStorage.setItem('access_token', data.accessToken);
-    }
+      
+      if (response.ok && data.access_token) {
+        localStorage.setItem('access_token', data.access_token);
+      }
       // // console.log(data);
       return data ?? [];
     } catch (error) {

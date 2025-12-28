@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1 import auth, book, user, category, role, permission, loan, calendar, stats
+from app.api.v1 import auth, book, user, category, role, permission, loan, calendar, stats, token
 from app.core.database import Base, engine
 from app.models.user import User
 from app.models.role import Role
@@ -45,6 +45,7 @@ app.include_router(permission.router)
 app.include_router(loan.router)
 app.include_router(calendar.router)
 app.include_router(stats.router)
+app.include_router(token.router)
 
 @app.get("/books")
 async def get_books():

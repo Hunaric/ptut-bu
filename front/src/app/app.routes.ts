@@ -6,12 +6,14 @@ import { BookComponent } from './admin/book/book.component';
 import { SignInComponent } from './pages/auth-pages/sign-in/sign-in.component';
 import { SignUpComponent } from './pages/auth-pages/sign-up/sign-up.component';
 import { NotFoundComponent } from './pages/other-pages/not-found/not-found.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
     // Page d'accueil
     {
         path: '',
         component: AppLayoutComponent,
+        canActivate: [authGuard],
         children: [
             {
                 path: '',

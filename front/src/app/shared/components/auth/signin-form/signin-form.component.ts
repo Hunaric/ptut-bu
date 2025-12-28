@@ -55,6 +55,7 @@ export class SigninFormComponent {
         var password = this.loginForm.value.password;
 
         const res = await this.authService.onLogedIn(identifier, password);
+        
         if (res && res.access_token) {
           localStorage.setItem('access_token', res.access_token);
           // console.log(res);
