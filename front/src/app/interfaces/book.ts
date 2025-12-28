@@ -1,6 +1,7 @@
 // book.model.ts
 
 import { Category } from "./category";
+import { Tag } from "./tag";
 
 export interface Book {
   id: number;
@@ -8,11 +9,12 @@ export interface Book {
   author?: string;
   description?: string;
   isbn?: string;
-  published_year?: number;
+  published_year?: string;
   quantity: number;
   cover_url?: string;
 
   category?: Category;
+  tag?: Tag[];
 }
 
 export interface BookFilter {

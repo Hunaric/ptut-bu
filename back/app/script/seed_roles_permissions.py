@@ -12,13 +12,14 @@ PERMISSIONS = [
     {"name": "loan:view_all", "description": "Voir tous les prêts"},
     {"name": "loan:manage", "description": "Gérer tous les prêts"},
     {"name": "loan:view_own", "description": "Voir ses propres emprunts"},
+    {"name": "book:manage", "description": "Gérer les livres"},
 ]
 
 # Rôles et leurs permissions par défaut
 ROLES = {
     "Student": ["loan:create", "loan:view_own"],
     "Teacher": ["loan:create", "loan:approve"],
-    "Librarian": ["loan:create", "loan:approve", "loan:return", "loan:view_all", "loan:manage"],
+    "Librarian": ["loan:create", "loan:approve", "loan:return", "loan:view_all", "loan:manage", "book:manage"],
     "Admin": ["loan:create", "loan:approve", "loan:return", "loan:view_all", "loan:manage"],
 }
 

@@ -2,7 +2,8 @@
   <img
     [src]="imageUrl || fallbackUrl"
     alt="book cover"
-    (error)="onImageError($event)"
+  (error)="onImageError($event)"
+  (load)="onImageLoad($event)"
     class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
   />
 </div>

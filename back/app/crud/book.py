@@ -23,10 +23,12 @@ def create_book(db: Session, book: BookCreate):
                 detail="ISBN already exists"
             )
 
-    db_book = Book(
-        **book.dict(exclude={"tags"}),
-        cover_url=get_cover_url(book.isbn)
-    )
+    # On exclut les tags ET cover_url pour éviter les doublons
+    book_data = book.dict(exclude={"tags", "cover_url"})
+    # On calcule cover_url à partir de l'ISBN
+    book_data["cover_url"] = get_cover_url(book.isbn)
+
+    db_book = Book(**book_data)
 
     if book.tags:
         tags = db.query(Tag).filter(Tag.id.in_(book.tags)).all()
@@ -210,5 +212,9 @@ def get_cover_url(isbn: str | None) -> str | None:
 
 
 def search_books_by_title(db: Session, title: str):
-    query = db.query(Book).filter(Book.title.ilike(f"%{title}%"))
+    query = db.query(Book).filter(or_(
+            Book.title.ilike(f"%{title}%"),
+            Book.author.ilike(f"%{title}%")
+        )
+        )
     return query.all()

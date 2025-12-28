@@ -7,6 +7,8 @@ import { SignInComponent } from './pages/auth-pages/sign-in/sign-in.component';
 import { SignUpComponent } from './pages/auth-pages/sign-up/sign-up.component';
 import { NotFoundComponent } from './pages/other-pages/not-found/not-found.component';
 import { authGuard } from './guards/auth.guard';
+import { CrudBookComponent } from './pages/crud-book/crud-book.component';
+import { DetailBookComponent } from './pages/detail-book/detail-book.component';
 
 export const routes: Routes = [
     // Page d'accueil
@@ -25,12 +27,27 @@ export const routes: Routes = [
             {
                 path:'calendar',
                 component:CalenderComponent,
-                title:'Angular Calender | TailAdmin - Angular Admin Dashboard Template'
+                title:'Calendrier des retours'
             },
             {
                 path:'books',
                 component:BookComponent,
-                title:'Angular Calender | TailAdmin - Angular Admin Dashboard Template'
+                title:'Les livres'
+            },
+            {
+                path:'crud-books',
+                component:CrudBookComponent,
+                title:'Gestion des livres'
+            },
+            {
+                path:'crud-books/:id',
+                component:CrudBookComponent,
+                title:'Modifier un livre'
+            },
+            {
+                path:'detail-books/:id',
+                component:DetailBookComponent,
+                title:'Detail du livre'
             },
             
         ],

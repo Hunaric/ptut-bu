@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1 import auth, book, user, category, role, permission, loan, calendar, stats, token
+from app.api.v1 import auth, book, user, category, role, permission, loan, calendar, stats, token, tag
 from app.core.database import Base, engine
 from app.models.user import User
 from app.models.role import Role
@@ -40,6 +40,7 @@ app.include_router(book.router)
 app.include_router(user.router) 
 app.include_router(auth.router) 
 app.include_router(category.router)
+app.include_router(tag.router)
 app.include_router(role.router)
 app.include_router(permission.router)
 app.include_router(loan.router)

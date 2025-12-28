@@ -1,0 +1,87 @@
+<div class="max-w-6xl mx-auto px-6 py-8">
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center text-gray-500">
+    Chargement du livre...
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="text-center text-red-600">
+    {{ error }}
+  </div>
+
+  <!-- Book details -->
+  <div *ngIf="book" class="bg-white dark:bg-gray-900 shadow-xl rounded-2xl p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+
+    <!-- Cover -->
+    <div class="flex justify-center">
+      <img
+        [src]="book.cover_url || fallbackUrl"
+        alt="Couverture du livre"
+        class="w-52 h-72 object-cover rounded-lg shadow-md"
+      />
+
+    </div>
+
+    <!-- Infos -->
+    <div class="md:col-span-2 space-y-4">
+
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+        {{ book.title }}
+      </h1>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300">
+
+        <p><span class="font-medium">Auteur :</span> {{ book.author || '—' }}</p>
+        <p><span class="font-medium">ISBN :</span> {{ book.isbn || '—' }}</p>
+        <p><span class="font-medium">Année :</span> {{ book.published_year || '—' }}</p>
+        <p><span class="font-medium">Quantité :</span> {{ book.quantity }}</p>
+        <p><span class="font-medium">Catégorie :</span> {{ book.category?.name || '—' }}</p>
+      </div>
+
+      <!-- Tags -->
+      <div *ngIf="book.tag?.length">
+        <h3 class="font-semibold text-gray-900 dark:text-white mt-4 mb-2">
+          Tags
+        </h3>
+
+        <div class="flex flex-wrap gap-2">
+          <span
+            *ngFor="let tag of book.tag"
+            class="px-3 py-1 rounded-full text-sm bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200"
+          >
+            {{ tag.name }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <h3 class="font-semibold text-gray-900 dark:text-white mt-4 mb-1">
+          Description
+        </h3>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+          {{ book.description || 'Aucune description disponible.' }}
+        </p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-3 pt-6">
+        <button
+          (click)="goBack()"
+          class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          Retour
+        </button>
+
+        <button
+          (click)="editBook()"
+          class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+        >
+          Modifier
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

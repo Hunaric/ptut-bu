@@ -8,6 +8,7 @@ import { Book } from '../../../interfaces/book';
 import { BookService } from '../../../services/book.service';
 import { debounceTime, Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-app-header',
@@ -15,10 +16,11 @@ import { FormsModule } from '@angular/forms';
   imports: [
     CommonModule,
     ThemeToggleButtonComponent,
-    NotificationDropdownComponent, 
+    NotificationDropdownComponent,
     UserDropdownComponent,
-    FormsModule
-  ],
+    FormsModule,
+    RouterLink
+],
   templateUrl: './app-header.component.html',
   styleUrl: './app-header.component.css'
 })
@@ -60,6 +62,8 @@ export class AppHeaderComponent {
   selectBook(book: Book) {
     this.searchTerm = book.title;
     this.showDropdown = false;
+
+      // this.router.navigate(['/books/']);
     // Ici tu peux router vers la page du livre si nécessaire
   }
 

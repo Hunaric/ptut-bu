@@ -186,7 +186,7 @@ export class AppSidebarComponent {
       subItems: [
         { name: "Tableau de bord", path: "/" },
       ...(this.permissions.includes("loan:manage" )
-        ? [{ name: "Gestion des livres", path: "/statistics", pro: true }]
+        ? [{ name: "Gestion des livres", path: "/crud-books", pro: true }]
         : [{ name: "Mes recommandations", path: "/statistics", pro: false }]),
       ]
     },

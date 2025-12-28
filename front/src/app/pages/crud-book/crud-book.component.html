@@ -1,0 +1,86 @@
+    <div class="w-full max-w-4xl mx-auto p-6 bg-white rounded shadow-md">
+
+  <h2 class="text-2xl font-semibold mb-6">
+    {{ bookId ? 'Modifier le livre' : 'Créer un livre' }}
+  </h2>
+
+  <form [formGroup]="bookForm" (ngSubmit)="submitForm()">
+
+    <!-- Title -->
+    <div class="mb-4">
+      <label class="block mb-1 font-medium">Titre</label>
+      <input type="text" formControlName="title" placeholder="Titre du livre"
+             class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      <div *ngIf="bookForm.get('title')?.invalid && bookForm.get('title')?.touched" class="text-red-500 text-sm">
+        Le titre est requis
+      </div>
+    </div>
+
+    <!-- Author -->
+    <div class="mb-4">
+      <label class="block mb-1 font-medium">Auteur</label>
+      <input type="text" formControlName="author" placeholder="Auteur"
+             class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+    </div>
+
+    <!-- Description -->
+    <div class="mb-4">
+      <label class="block mb-1 font-medium">Description</label>
+      <textarea formControlName="description" rows="4" placeholder="Description"
+                class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+    </div>
+
+    <!-- ISBN -->
+    <div class="mb-4">
+      <label class="block mb-1 font-medium">ISBN</label>
+      <input type="text" formControlName="isbn" placeholder="ISBN"
+             class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+    </div>
+
+    <!-- Published Year -->
+    <div class="mb-4">
+      <label class="block mb-1 font-medium">Année de publication</label>
+      <input type="number" formControlName="published_year" placeholder="2025"
+             class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+    </div>
+
+    <!-- Quantity -->
+    <div class="mb-4">
+      <label class="block mb-1 font-medium">Quantité</label>
+      <input type="number" formControlName="quantity" min="1"
+             class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+    </div>
+
+    <!-- Category -->
+    <div class="mb-4">
+      <label class="block mb-1 font-medium">Catégorie</label>
+      <select formControlName="category_id"
+              class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option [ngValue]="null">-- Sélectionner une catégorie --</option>
+        <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+      </select>
+    </div>
+
+    <!-- Tags -->
+     <div class="mb-6">
+  <label class="block mb-1 font-medium">Tags</label>
+  <div class="flex flex-wrap gap-2 max-h-40 overflow-y-auto border p-2 rounded">
+    <label *ngFor="let tag of tags | slice:0:20" class="flex items-center space-x-2">
+      <input type="checkbox" [value]="tag.id"
+             [checked]="bookForm.value.tags?.includes(tag.id) ?? false"
+             (change)="onTagChange($event)"
+             class="form-checkbox h-4 w-4 text-blue-600"/>
+      <span>{{ tag.name }}</span>
+    </label>
+  </div>
+</div>
+
+
+    <!-- Submit -->
+    <button type="submit"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition">
+      {{ bookId ? 'Mettre à jour' : 'Créer' }}
+    </button>
+
+  </form>
+</div>

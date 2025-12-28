@@ -68,7 +68,9 @@
         <li *ngFor="let book of books"
             (click)="selectBook(book)"
             class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
-          {{ book.title }} <span class="text-gray-400 text-sm">- {{ book.author }}</span>
+            <a [routerLink]="['/detail-books', book.id]">
+              {{ book.title }} <span class="text-gray-400 text-sm">- {{ book.author }}</span>
+            </a>
         </li>
       </ul>
     </div>

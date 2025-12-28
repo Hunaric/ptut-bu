@@ -6,6 +6,8 @@ import { firstValueFrom, Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { PaginatedResponse } from '../interfaces/paginated-response';
 import { Book } from '../interfaces/book';
+import { Category } from '../interfaces/category';
+import { Tag } from '../interfaces/tag';
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +25,7 @@ export class BookService {
     return {
       Authorization: `Bearer ${this.accessToken}`,
       Accept: 'application/json',
+    'Content-Type': 'application/json',
     };
   }
 
@@ -112,25 +115,25 @@ export class BookService {
     }
   }
 
-  /**
-   * ➕ Créer un livre
-   * POST /books
-   */
-  async createBook(book: Partial<Book>): Promise<Book> {
-    const url = `${this.apiUrl}`;
-
-    try {
-      const data = await firstValueFrom(
-        this.http.post<Book>(url, book, {
-          headers: this.getAuthHeaders(),
-        })
-      );
-      return data;
-    } catch (error) {
-      console.error('Erreur lors de la création du livre', error);
-      throw error;
-    }
+/**
+ * ➕ Créer un livre
+ * POST /books
+ */
+async createBook(book: Partial<Book>): Promise<Book> {
+  try {
+    const data = await firstValueFrom(
+      this.http.post<Book>(
+        `${this.apiUrl}/`,
+        book,
+        { headers: this.getAuthHeaders() }  // <-- ici !
+      )
+    );
+    return data;
+  } catch (error) {
+    console.error('Erreur lors de la création du livre', error);
+    throw error;
   }
+}
 
   /**
    * ✏️ Mettre à jour un livre
@@ -175,4 +178,13 @@ export class BookService {
     const params = new HttpParams().set('title', title);
     return this.http.get<Book[]>(`${this.apiUrl}/search`, { params });
   }
+
+  async getCategories(): Promise<Category[]> {
+  return firstValueFrom(this.http.get<Category[]>(`${environment.apiUrl}/categories`, { headers: this.getAuthHeaders() }));
+}
+
+async getTags(): Promise<Tag[]> {
+  return firstValueFrom(this.http.get<Tag[]>(`${environment.apiUrl}/tags`, { headers: this.getAuthHeaders() }));
+}
+
 }
