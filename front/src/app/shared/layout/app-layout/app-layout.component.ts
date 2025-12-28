@@ -7,6 +7,7 @@ import { AppFooterComponent } from '../app-footer/app-footer.component';
 import { CommonModule } from '@angular/common';
 import { SidebarService } from '../../services/sidebar.service';
 import { FormsModule } from '@angular/forms';
+import { MyPermissions } from '../../../interfaces/permission';
 
 @Component({
   selector: 'app-app-layout',

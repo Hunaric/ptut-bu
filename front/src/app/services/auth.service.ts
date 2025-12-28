@@ -4,6 +4,7 @@ import { environment } from '../../environment/environment';
 import { firstValueFrom, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { MyPermissions } from '../interfaces/permission';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -18,10 +19,12 @@ export class AuthService {
     return localStorage.getItem('access_token');
   }
   
-  getToken(): string | null {
-    return localStorage.getItem('access_token');
+
+  getPermissions(): string[] {
+    const permJson = localStorage.getItem('permissions');
+    return permJson ? JSON.parse(permJson) : [];
   }
-  
+
 
   logout(): void {
     localStorage.clear();

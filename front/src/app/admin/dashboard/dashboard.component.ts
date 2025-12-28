@@ -8,6 +8,8 @@ import { DashboardStats } from '../../interfaces/dashboard-stats';
 import { StatsService } from '../../services/stats.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Me } from '../../interfaces/user';
+import { MyPermissions } from '../../interfaces/permission';
 
 @Component({
   selector: 'app-dashboard',
@@ -40,7 +42,7 @@ selectedYear: number = new Date().getFullYear();
 
 async ngOnInit() {
   this.stats = await this.statsService.getDashboardStats();
-    console.log(this.stats);
+    
 }
 
 

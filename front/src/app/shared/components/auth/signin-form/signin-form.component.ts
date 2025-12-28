@@ -57,11 +57,11 @@ export class SigninFormComponent {
         const res = await this.authService.onLogedIn(identifier, password);
         if (res && res.access_token) {
           localStorage.setItem('access_token', res.access_token);
-          console.log(res);
+          // console.log(res);
           
           const me = await this.authService.getMe();
-          localStorage.setItem('user', JSON.stringify(me));
-          console.log('info :', me);
+          localStorage.setItem('permissions', JSON.stringify(me.permissions));
+          // console.log('info :', me);
           
           
           // Navigation uniquement en cas de succès

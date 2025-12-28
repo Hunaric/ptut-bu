@@ -12,3 +12,10 @@ export interface User {
   role?: Role;
   permissions?: Permission[];
 }
+
+export interface Me {
+  username: string;           // UUID
+  email: string;
+  role?: Role;
+  permissions?: Permission[];
+}
