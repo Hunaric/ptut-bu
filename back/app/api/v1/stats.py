@@ -86,6 +86,46 @@ def on_time_return_rate_by_year(db: Session, year: int):
 
     return round((on_time / total_returns) * 100, 2)
 
+def user_dashboard_stats(user_id: int, db: Session):
+    loans = get_user_loans(db, user_id)
+    total_loans = len(loans)
+
+    if total_loans == 0:
+        return {
+            "scope": "user",
+            "total_loans": 0,
+            "on_time_return_rate": 0,
+            "metrics": {
+                "total_books": db.query(func.count(Book.id)).scalar(),
+                "total_loans": 0,
+                "active_loans": 0,
+                "late_loans": 0,
+                "return_rate": 0,
+            },
+        }
+
+    on_time_returns = sum(
+        1 for loan in loans
+        if loan.return_date and loan.return_date <= loan.due_date
+    )
+
+    return {
+        "scope": "user",
+        "total_loans": total_loans,
+        "on_time_return_rate": round((on_time_returns / total_loans) * 100, 2),
+        "metrics": {
+            "total_books": db.query(func.count(Book.id)).scalar(),
+            "total_loans": total_loans,
+            "active_loans": sum(1 for loan in loans if loan.return_date is None),
+            "late_loans": sum(
+                1 for loan in loans
+                if loan.return_date is None and loan.due_date < date.today()
+            ),
+            "return_rate": round((on_time_returns / total_loans) * 100, 2),
+        },
+    }
+
+
 def metrics(db: Session, year: int):
     today = date.today()
 
@@ -133,12 +173,36 @@ def user_loan_stats(user_id: int, db: Session = Depends(get_db)):
     if total_loans == 0:
         return {
             "total_loans": 0,
-            "on_time_return_rate": 0
+            "on_time_return_rate": 0,
+            "metrics": {
+                "total_books": db.query(func.count(Book.id)).scalar(),
+                "total_loans": 0,
+                "active_loans": 0,
+                "late_loans": 0,
+                "return_rate": 0
+            }
         }
 
     on_time_returns = sum(1 for loan in loans if loan.return_date and loan.return_date <= loan.due_date)
 
     return {
         "total_loans": total_loans,
-        "on_time_return_rate": round((on_time_returns / total_loans) * 100, 2)
+        "on_time_return_rate": round((on_time_returns / total_loans) * 100, 2),
+        "metrics": {
+            "total_books": db.query(func.count(Book.id)).scalar(),
+            "total_loans": total_loans,
+            "active_loans": sum(1 for loan in loans if loan.return_date is None),
+            "late_loans": sum(1 for loan in loans if loan.return_date is None and loan.due_date < date.today()),
+            "return_rate": round((on_time_returns / total_loans) * 100, 2)
+        }
     }
+
+@router.get("/user/dashboard")
+def user_dashboard(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    print("Current User:", current_user)
+    if current_user is None:
+        return {"detail": "Authentication required."}
+    if current_user.has_permission("loan:manage", "loan:view_all"):
+        return dashboard_stats(db=db)
+    else:
+        return user_dashboard_stats(current_user.id, db)

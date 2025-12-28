@@ -43,3 +43,15 @@ class User(Base):
         foreign_keys="Loan.approved_by_id",
         back_populates="approved_by"
     )
+
+
+    def has_permission(self, *permission_names: str) -> bool:
+        if self.is_superuser:
+            return True
+
+        user_permissions = {p.name for p in self.permissions}
+
+        if self.role:
+            user_permissions |= {p.name for p in self.role.permissions}
+
+        return any(name in user_permissions for name in permission_names)
