@@ -1,0 +1,61 @@
+<div *ngIf="loading" class="p-4 text-gray-600">Chargement des prêts...</div>
+<div *ngIf="error" class="p-4 text-red-600">{{ error }}</div>
+
+<table *ngIf="!loading && loans.length" class="table-auto w-full border-collapse border border-gray-300">
+  <thead>
+    <tr class="bg-gray-200">
+      <th class="px-4 py-2 border">Livre</th>
+      <th class="px-4 py-2 border">Emprunteur</th>
+      <th class="px-4 py-2 border">Date d'échéance</th>
+      <th class="px-4 py-2 border">Statut</th>
+      <th class="px-4 py-2 border">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let loan of loans" class="border-b">
+      <td class="px-4 py-2 border">{{ loan.book_title }}</td>
+      <td class="px-4 py-2 border">{{ loan.borrower_name || 'N/A' }}</td>
+      <td class="px-4 py-2 border">{{ loan.due_date | date }}</td>
+      <td class="px-4 py-2 border">
+        <span [ngClass]="statusColors[loan.status]">
+          {{ statusLabels[loan.status] }}
+        </span>
+      </td>
+
+      <td class="px-4 py-2 border space-x-2">
+        <button *ngIf="loan.status === 'requested'" class="bg-green-500 text-white px-2 py-1 rounded" (click)="approveLoan(loan)">Approuver</button>
+        <button *ngIf="loan.status === 'late'" class="bg-yellow-500 text-white px-2 py-1 rounded" (click)="markAsReturned(loan)">Marquer rendu</button>
+        <button *ngIf="loan.status === 'approved' || loan.status === 'ongoing'" class="bg-blue-500 text-white px-2 py-1 rounded" (click)="markAsReturned(loan)">Marquer rendu</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div *ngIf="!loading && !loans.length" class="p-4 text-gray-600">Aucun prêt trouvé.</div>
+<!-- Pagination -->
+<div class="mt-4 flex justify-center items-center space-x-2">
+  <button 
+    class="px-2 py-1 border rounded" 
+    [disabled]="page <= 1" 
+    (click)="changePage(page - 1)">
+    Précédent
+  </button>
+
+  <span>Page</span>
+  <input 
+    type="number" 
+    min="1" 
+    [max]="totalPages" 
+    [(ngModel)]="pageInput" 
+    (keyup.enter)="goToPage()" 
+    class="w-16 px-2 py-1 border rounded text-center" 
+  />
+  <span>/ {{ totalPages }}</span>
+
+  <button 
+    class="px-2 py-1 border rounded" 
+    [disabled]="page >= totalPages" 
+    (click)="changePage(page + 1)">
+    Suivant
+  </button>
+</div>

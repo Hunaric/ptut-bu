@@ -140,17 +140,16 @@ def metrics(db: Session, year: int):
     }
 
 def late_by_month(db: Session, year: int):
-    """Retourne le nombre de prêts en retard par mois pour l'année donnée"""
     today = date.today()
     results = (
         db.query(
-            extract("month", Loan.loan_date).label("month"),
+            extract("month", Loan.due_date).label("month"),  # <-- ici
             func.count(Loan.id)
         )
         .filter(
-            extract("year", Loan.loan_date) == year,
-            Loan.return_date.is_(None),       # Non encore retourné
-            Loan.due_date < today             # Dépassé
+            extract("year", Loan.due_date) == year,  # <-- ici aussi
+            Loan.return_date.is_(None),
+            Loan.due_date < today
         )
         .group_by("month")
         .order_by("month")
@@ -161,6 +160,7 @@ def late_by_month(db: Session, year: int):
     for month, count in results:
         data[int(month) - 1] = count
     return data
+
 
 @router.get("/dashboard", dependencies=[Depends(require_any_permission("loan:manage", "loan:view_all"))])
 def dashboard_stats(year: int = date.today().year, db: Session = Depends(get_db)):

@@ -10,6 +10,8 @@ import { authGuard } from './guards/auth.guard';
 import { CrudBookComponent } from './pages/crud-book/crud-book.component';
 import { DetailBookComponent } from './pages/detail-book/detail-book.component';
 import { MyLoansComponent } from './pages/my-loans/my-loans.component';
+import { UserPermissionComponent } from './pages/user-permission/user-permission.component';
+import { LoanListComponent } from './pages/loan-list/loan-list.component';
 
 export const routes: Routes = [
     // Page d'accueil
@@ -54,6 +56,18 @@ export const routes: Routes = [
                 path:'my-loans',
                 component:MyLoansComponent,
                 title:'Mes emprunts'
+            },
+            
+            {
+                path:'permission',
+                component:UserPermissionComponent,
+                title:'Permissions des utilisateurs'
+            },
+            
+            {
+                path:'loan-list',
+                component:LoanListComponent,
+                title:'Liste des prêts'
             },
             
         ],

@@ -47,23 +47,46 @@
       </app-badge>
     </div>
   </div>
+<!-- On-Time Return Rate -->
+<div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+  <div class="flex items-end justify-between mt-5">
+    <div>
+      <span class="text-sm text-gray-500 dark:text-gray-400">
+        Retour de livres ponctuel pour {{ year }}
+      </span>
 
-  <!-- On-Time Return Rate -->
-  <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-    <div class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800" >
+      <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+        {{
+          (
+            ((metrics?.total_loans ?? 0)
+            - ((metrics?.late_loans ?? 0) + (metrics?.active_loans ?? 0)))
+            / (metrics?.total_loans ?? 1) * 100
+          ) | number:'1.2-2'
+        }}%
+      </h4>
     </div>
-    <div class="flex items-end justify-between mt-5">
-      <div>
-        <span class="text-sm text-gray-500 dark:text-gray-400">Retour de livres ponctuel pour {{year}}</span>
-        <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{{ (((metrics?.total_loans ?? 0) - ((metrics?.late_loans ?? 0) + (metrics?.active_loans ?? 0) )) / (metrics?.total_loans ?? 1) * 100) | number:'1.2-2' }}%</h4>
-      </div>
-      <app-badge color="success">
-        
-        <span [innerHTML]="icons.arrowUpIcon | safeHtml"></span>
-{{ ((metrics?.total_loans ?? 0) - ((metrics?.late_loans ?? 0) + (metrics?.active_loans ?? 0) )) }}/{{ metrics?.total_loans ?? 0 }} 
-<!-- ({{ (((metrics?.total_loans ?? 0) - ((metrics?.late_loans ?? 0) + (metrics?.active_loans ?? 0) )) / (metrics?.total_loans ?? 1) * 100) | number:'1.0-0' }}%) -->
 
-      </app-badge>
-    </div>
+    <app-badge
+      [color]="
+        (
+          ((metrics?.total_loans ?? 0)
+          - ((metrics?.late_loans ?? 0) + (metrics?.active_loans ?? 0)))
+          / (metrics?.total_loans ?? 1) * 100
+        ) > 50 ? 'success' : 'error'
+      "
+    >
+      {{
+        (
+          ((metrics?.total_loans ?? 0)
+          - ((metrics?.late_loans ?? 0) + (metrics?.active_loans ?? 0)))
+          / (metrics?.total_loans ?? 1) * 100
+        ) > 50 ? '✔' : '⚠'
+      }}
+
+      {{ ((metrics?.total_loans ?? 0) - ((metrics?.late_loans ?? 0) + (metrics?.active_loans ?? 0))) }}
+      / {{ metrics?.total_loans ?? 0 }}
+    </app-badge>
   </div>
+</div>
+
 </div>

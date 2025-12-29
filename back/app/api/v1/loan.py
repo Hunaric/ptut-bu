@@ -8,6 +8,7 @@ from app.schemas.book import BookResponse
 from app.core.dependencies import require_admin, require_permission, require_superuser, get_current_user, require_any_permission
 from app.core.database import get_db
 from app.models.user import User
+from app.models.book import Book
 from datetime import date, timedelta
 from typing import List, Optional
 from app.models.loan import Loan
@@ -64,9 +65,47 @@ def get_late_loans(
 from datetime import timedelta
 
 
-@router.get("/", response_model=List[LoanResponse])
-def read_all_loans(db: Session = Depends(get_db)):
-    return crud.get_all_loans(db)
+# @router.get("/", response_model=List[LoanResponse])
+# def read_all_loans(db: Session = Depends(get_db)):
+#     return crud.get_all_loans(db)
+
+@router.get("/")
+def get_all_loans(
+    db: Session = Depends(get_db),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1),
+):
+    query = (
+        db.query(Loan, Book.title.label("book_title"), User.email.label("borrower_name"))
+        .join(Book, Book.id == Loan.book_id)
+        .join(User, User.id == Loan.user_id)
+        .order_by(Loan.loan_date.desc())  # <-- tri par date décroissante
+    )
+
+    total = query.count()  # nombre total de prêts
+    loans = query.offset(skip).limit(limit).all()  # pagination
+
+    result = []
+    for loan, book_title, borrower_name in loans:
+        result.append({
+            "id": loan.id,
+            "book_id": loan.book_id,
+            "user_id": loan.user_id,
+            "book_title": book_title,
+            "borrower_name": borrower_name,
+            "loan_date": loan.loan_date,
+            "due_date": loan.due_date,
+            "return_date": loan.return_date,
+            "status": loan.status
+        })
+
+    return {
+        "total": total,
+        "skip": skip,
+        "limit": limit,
+        "data": result
+    }
+
 
 
 @router.get("/late")
@@ -96,7 +135,7 @@ def get_late_and_upcoming_loans(
     # Retour structuré : on peut ajouter un flag "status"
     result = []
     for loan in loans:
-        status = "late" if loan.due_date < today else "upcoming"
+        status = "late" if loan.due_date < today else "ongoing"
         result.append({
             "id": loan.id,
             "book_title": loan.book.title,
@@ -110,6 +149,8 @@ def get_late_and_upcoming_loans(
 
 @router.get(
     "/me",
+    deprecated=True,
+    description="⚠️ Deprecie: utiliser GET /loans/me/borrowed plutot",
     response_model=list[LoanResponse],
     dependencies=[Depends(require_any_permission("loan:view_own", "loan:manage"))]
 )

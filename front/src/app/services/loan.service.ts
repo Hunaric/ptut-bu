@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environment/environment';
-import { Loan, LoanCalendar } from '../interfaces/loan';
+import { Loan, LoanCalendar, LoanList } from '../interfaces/loan';
 import { BorrowedBook } from '../interfaces/book';
 
 @Injectable({
@@ -75,4 +75,39 @@ export class LoanService {
       throw error;
     }
   }
+
+
+/** Récupérer tous les prêts avec pagination */
+async getAllLoans(page: number = 1, pageSize: number = 20): Promise<{ data: LoanList[], total: number }> {
+  const skip = (page - 1) * pageSize;
+  try {
+    const response = await firstValueFrom(
+      this.http.get<{ data: LoanList[], total: number }>(
+        `${this.apiUrl}/loans?skip=${skip}&limit=${pageSize}`,
+        { withCredentials: true }
+      )
+    );
+    return response;
+  } catch (error) {
+    console.error('Erreur lors de la récupération des prêts', error);
+    throw error;
+  }
+}
+
+
+  
+  /** Mettre à jour le statut d’un prêt */
+  async updateLoanStatus(loanId: number, status: 'approved' | 'returned' | 'extended' | 'rejected'): Promise<Loan> {
+    try {
+      const data = { status };
+      const updatedLoan = await firstValueFrom(
+        this.http.patch<Loan>(`${this.apiUrl}/loans/${loanId}/status`, data, { withCredentials: true })
+      );
+      return updatedLoan;
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du statut du prêt', error);
+      throw error;
+    }
+  }
+
 }

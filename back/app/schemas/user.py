@@ -1,7 +1,8 @@
 from app.schemas.role import RoleResponse
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from .account import Account, AccountCreate
+from .permission import PermissionResponse
 import uuid
 
 class UserBase(BaseModel):
@@ -24,6 +25,7 @@ class User(UserBase):
     id: uuid.UUID  
     role: Optional[RoleResponse] = None
     account: Optional[Account] = None
+    permissions: List[PermissionResponse] = [] 
 
     model_config = {
         "from_attributes": True

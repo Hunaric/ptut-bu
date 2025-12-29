@@ -62,18 +62,19 @@ async loadLateLoans() {
     let calendarLevel = '';
     let titleSuffix = '';
 
-    if (dueDate < today) {
-      // en retard
-      calendarLevel = 'Danger';
-      titleSuffix = 'en retard';
-    } else if (dueDate <= new Date(today.getTime() + warningDays * 24 * 60 * 60 * 1000)) {
-      // à rendre bientôt
-      calendarLevel = 'Warning';
-      titleSuffix = 'à rendre bientôt';
-    } else {
-      calendarLevel = 'Success';
-      titleSuffix = '';
-    }
+    // Utilisation du champ "status" renvoyé par le backend
+if (dueDate < today) {
+  // en retard
+  calendarLevel = 'Danger';
+  titleSuffix = 'en retard';
+} else if (dueDate <= new Date(today.getTime() + warningDays * 24*60*60*1000)) {
+  // à rendre bientôt
+  calendarLevel = 'Warning';
+  titleSuffix = 'à rendre bientôt';
+} else {
+  calendarLevel = 'Success';
+}
+
 
     return {
       id: loan.id.toString(),

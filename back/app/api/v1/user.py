@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.models.user import User as UserModel
 
+from app.core.dependencies import require_permission
 from app.core.database import get_db
 from app.schemas.user import UserCreate, User, UserUpdate
 from app.schemas.account import AccountUpdate
@@ -58,26 +59,26 @@ def update_account_info(user_id: int, updates: AccountUpdate, db: Session = Depe
     return db_user
 
 
-@router.post("/{user_id}/permissions/{permission_id}", response_model=User)
+@router.post("/{user_id}/permissions/{permission_id}", response_model=User, dependencies=[Depends(require_permission("loan:manage"))])
 def add_permission_to_user(user_id: str, permission_id: int, db: Session = Depends(get_db)):
     user = assign_permission_to_user(db, user_id, permission_id)
     return user
 
 
-@router.delete("/{user_id}/permissions/{permission_id}", response_model=User)
+@router.delete("/{user_id}/permissions/{permission_id}", response_model=User, dependencies=[Depends(require_permission("loan:manage"))])
 def remove_permission_from_user_endpoint(user_id: str, permission_id: int, db: Session = Depends(get_db)):
     user = remove_permission_from_user(db, user_id, permission_id)
     return user
 
 
-@router.get("/{identifier}", response_model=User)
+@router.get("/by-identifier/{identifier}", response_model=User)
 def get_unique_user(identifier: str, db: Session = Depends(get_db)):
     user = get_user_by_identifier(db, identifier)
     if not user:
         raise HTTPException(404, "User not found")
     return user
 
-@router.get("/{email}", response_model=User)
+@router.get("/mail/{email}", response_model=User, deprecated=True, description="This endpoint is deprecated. Use /users/{identifier} instead.")
 def get_user_by_email_endpoint(email: str, db: Session = Depends(get_db)):
     user = get_user_by_email(db, email)
     if not user:

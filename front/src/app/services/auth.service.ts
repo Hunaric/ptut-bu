@@ -5,6 +5,7 @@ import { firstValueFrom, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MyPermissions } from '../interfaces/permission';
+import { Me } from '../interfaces/user';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -61,31 +62,8 @@ export class AuthService {
     }
   }
   
-  async registration(data: any): Promise<any> {
-    const url = `${this.apiUrl}/clients/registration`;
 
-    const options = {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json', Accept: 'application/json'},
-      body: JSON.stringify(data)
-    }
-    ;
-
-    try {
-      
-      const response = await fetch(url, options);
-      const data = await response.json();
-      console.log("Données envoyées :", data);
-      // // console.log(data);
-      return data ?? [];
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
-
-
-async getMe(): Promise<any> {
+async getMe(): Promise<Me> {
   const token = localStorage.getItem('access_token');
   if (!token) throw new Error('No access token');
 
@@ -100,16 +78,4 @@ async getMe(): Promise<any> {
   return res.json();
 }
 
-
-  
-  forgotPassword(email: string) {
-    return this.http.post(`${this.apiUrl}/clients/forgot-password`, { email });
-  }
-
-  resetPassword(token: string, newPassword: string) {
-    return this.http.post(`${this.apiUrl}/clients/reset-password`, {
-      token,
-      new_password: newPassword
-    });
-  }
 }
