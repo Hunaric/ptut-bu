@@ -11,6 +11,7 @@ import { ModalComponent } from '../../shared/components/ui/modal/modal.component
 import { KeyValuePipe } from '@angular/common';
 import { LoanService } from '../../services/loan.service';
 import { LoanCalendar } from '../../interfaces/loan';
+import { PageBreadcrumbComponent } from '../../components/common/page-breadcrumb/page-breadcrumb.component';
 
 
 interface CalendarEvent extends EventInput {
@@ -25,7 +26,8 @@ interface CalendarEvent extends EventInput {
     FullCalendarModule,
     ModalComponent, 
     KeyValuePipe,
-    FormsModule
+    FormsModule, 
+    PageBreadcrumbComponent
   ],
   templateUrl: './calender.component.html',
   styleUrl: './calender.component.css'

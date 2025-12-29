@@ -3,11 +3,13 @@ from app.schemas.pagination import PaginatedResponse
 from fastapi import APIRouter, Depends, Query, Body
 from sqlalchemy.orm import Session
 from app.crud import loan as crud
-from app.schemas.loan import LoanCreate, LoanResponse, LoanFilter, LoanUpdateStatus
+from app.schemas.loan import LoanCreate, LoanResponse, LoanFilter, LoanUpdateStatus, BorrowedBookResponse   
+from app.schemas.book import BookResponse
 from app.core.dependencies import require_admin, require_permission, require_superuser, get_current_user, require_any_permission
 from app.core.database import get_db
 from app.models.user import User
 from datetime import date, timedelta
+from typing import List, Optional
 from app.models.loan import Loan
 
 router = APIRouter(prefix="/loans", tags=["Loans"])
@@ -61,6 +63,12 @@ def get_late_loans(
 
 from datetime import timedelta
 
+
+@router.get("/", response_model=List[LoanResponse])
+def read_all_loans(db: Session = Depends(get_db)):
+    return crud.get_all_loans(db)
+
+
 @router.get("/late")
 def get_late_and_upcoming_loans(
     db: Session = Depends(get_db),
@@ -100,13 +108,21 @@ def get_late_and_upcoming_loans(
     return result
 
 
-@router.get("/{loan_id}", response_model=LoanResponse)
-def read_loan(loan_id: int, db: Session = Depends(get_db)):
-    return crud.get_loan_by_id(db, loan_id)
+@router.get(
+    "/me",
+    response_model=list[LoanResponse],
+    dependencies=[Depends(require_any_permission("loan:view_own", "loan:manage"))]
+)
+def read_my_loans(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    return crud.get_user_loans(db, current_user.id)
 
-@router.get("/", response_model=list[LoanResponse])
-def read_all_loans(db: Session = Depends(get_db)):
-    return crud.get_all_loans(db)
+
+@router.get("/me/borrowed", response_model=List[BorrowedBookResponse])
+def my_borrowed_books(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    return crud.get_my_borrowed_books(db, current_user.id)
 
 @router.get(
     "/advanced",
@@ -119,6 +135,11 @@ def read_loans_advanced(
     db: Session = Depends(get_db)
 ):
     return crud.get_loans_advanced(db, page, size)
+
+
+@router.get("/{loan_id}", response_model=LoanResponse)
+def read_loan(loan_id: int, db: Session = Depends(get_db)):
+    return crud.get_loan_by_id(db, loan_id)
 
 @router.get(
     "/user/{user_id}",

@@ -25,7 +25,7 @@ import { MyPermissions } from '../../interfaces/permission';
 })
 export class DashboardComponent implements OnInit{
   calendarOptions!: CalendarOptions;
-  years: number[] = [2025, 2024, 2023, 2022, 2021, 2020];
+  years: number[] = [2026, 2025, 2024, 2023, 2022, 2021, 2020];
 
   stats!: DashboardStats;
   async onYearChange() {
@@ -42,6 +42,7 @@ selectedYear: number = new Date().getFullYear();
 
 async ngOnInit() {
   this.stats = await this.statsService.getDashboardStats();
+    console.log(this.stats);
     
 }
 

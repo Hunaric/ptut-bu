@@ -1,0 +1,49 @@
+<app-page-breadcrumb pageTitle="Emprunts"></app-page-breadcrumb>
+
+<div class="p-6">
+  <h2 class="text-2xl font-semibold mb-4">Mes livres empruntés</h2>
+
+  <div *ngIf="loading" class="text-gray-500">Chargement...</div>
+  <div *ngIf="error" class="text-red-500">{{ error }}</div>
+
+  <table *ngIf="!loading && !error && loans.length" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+    <thead class="bg-gray-50 dark:bg-gray-800">
+      <tr>
+        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Couverture</th>
+        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Titre</th>
+        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Auteur</th>
+        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Date d'emprunt</th>
+        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Date de retour</th>
+        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Statut</th>
+        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+      <tr *ngFor="let loan of loans">
+        <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-100">
+          <img [src]="loan.cover_url" alt="Couverture" class="w-12 h-16 object-cover rounded" />
+        </td>
+        <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-100">{{ loan.title }}</td>
+        <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-100">{{ loan.author }}</td>
+        <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-100">{{ loan.loan_date | date:'shortDate' }}</td>
+        <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-100">
+          {{ loan.due_date ? (loan.due_date | date:'shortDate') : '-' }}
+        </td>
+        <td class="px-4 py-2 text-sm">
+        <span [ngClass]="getStatusColor(loan.status)" class="px-2 py-1 rounded font-medium">
+            {{ getStatusLabel(loan.status) }}
+        </span>
+        </td>
+
+        <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-100 space-x-2">
+          <button class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Renouveler</button>
+          <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">Rendre</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!loading && !error && loans.length === 0" class="text-gray-500 mt-4">
+    Vous n'avez aucun emprunt en cours.
+  </div>
+</div>

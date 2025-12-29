@@ -9,6 +9,7 @@ import { NotFoundComponent } from './pages/other-pages/not-found/not-found.compo
 import { authGuard } from './guards/auth.guard';
 import { CrudBookComponent } from './pages/crud-book/crud-book.component';
 import { DetailBookComponent } from './pages/detail-book/detail-book.component';
+import { MyLoansComponent } from './pages/my-loans/my-loans.component';
 
 export const routes: Routes = [
     // Page d'accueil
@@ -48,6 +49,11 @@ export const routes: Routes = [
                 path:'detail-books/:id',
                 component:DetailBookComponent,
                 title:'Detail du livre'
+            },
+            {
+                path:'my-loans',
+                component:MyLoansComponent,
+                title:'Mes emprunts'
             },
             
         ],

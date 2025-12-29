@@ -1,3 +1,5 @@
+<app-page-breadcrumb pageTitle="Details"></app-page-breadcrumb>
+
 <div class="max-w-6xl mx-auto px-6 py-8">
 
   <!-- Loading -->
@@ -66,22 +68,50 @@
       </div>
 
       <!-- Actions -->
-      <div class="flex gap-3 pt-6">
-        <button
-          (click)="goBack()"
-          class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-        >
-          Retour
-        </button>
+      <div class="flex gap-3 pt-6">  <!-- Bouton Modifier visible uniquement pour ceux ayant "loan:manage" -->
+  <button
+    *ngIf="permissions.includes('loan:manage')"
+    (click)="editBook()"
+    class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+  >
+    Modifier
+  </button>
 
-        <button
-          (click)="editBook()"
-          class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
-        >
-          Modifier
-        </button>
+  <!-- Bouton Créer Emprunt visible uniquement pour ceux ayant "loan:create" -->
+  <button
+    *ngIf="permissions.includes('loan:create')"
+    (click)="createLoan()"
+    class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+  >
+    Emprunter
+  </button>
+
+  <button
+    (click)="goBack()"
+    class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
+  >
+    Retour
+  </button>
       </div>
 
     </div>
   </div>
 </div>
+
+<!-- Modal -->
+<app-modal
+  [isOpen]="isModalOpen"
+  (close)="closeModal()"
+  [showCloseButton]="true"
+    className="max-w-[700px] p-6 lg:p-10"
+>
+  <div class="p-6">
+    <p>{{ modalMessage }}</p>
+    <button
+      (click)="closeModal()"
+      class="mt-4 bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
+    >
+      Fermer
+    </button>
+  </div>
+</app-modal>

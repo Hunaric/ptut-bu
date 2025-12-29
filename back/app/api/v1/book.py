@@ -48,6 +48,7 @@ def read_books_advanced(
         tag_ids=tag_ids
     )
 
+
 @router.get("/{book_id}", response_model=BookResponse)
 def read_one(book_id: int, db: Session = Depends(get_db)):
     return crud.get_book(db, book_id)

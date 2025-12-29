@@ -64,3 +64,24 @@ class LoanFilter(BaseModel):
 
 class LoanUpdateStatus(BaseModel):
     status: LoanStatus
+
+
+class BorrowedBookResponse(BaseModel):
+    loan_id: int
+    book_id: int
+    title: str
+    author: str
+    description: str
+    isbn: str
+    published_year: int
+    category_id: int
+    cover_url: str
+    loan_date: date
+    due_date: date
+    return_date: date | None
+    status: str
+    book_quantity: int
+
+    model_config = {
+        "from_attributes": True
+    }

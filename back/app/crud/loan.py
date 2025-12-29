@@ -2,10 +2,11 @@ from datetime import date, timedelta
 from app.schemas.pagination import PaginatedResponse
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import desc
 from app.models.loan import Loan
 from app.models.user import User
 from app.models.book import Book
-from app.schemas.loan import LoanCreate, LoanFilter, LoanStatus
+from app.schemas.loan import LoanCreate, LoanFilter, LoanStatus, BorrowedBookResponse
 import uuid
 from datetime import date, timedelta
 
@@ -142,3 +143,41 @@ def update_loan_status(db: Session, loan_id: int, new_status: LoanStatus):
 
 def get_user_loans(db: Session, user_id: uuid.UUID):
     return db.query(Loan).filter(Loan.user_id == user_id).all()
+
+
+
+def get_my_borrowed_books(db: Session, user_id: uuid.UUID):
+    """
+    Retourne tous les livres empruntés par l'utilisateur
+    dont le prêt n'est pas encore retourné (status != 'returned'),
+    avec les infos du livre et du prêt.
+    """
+    loans = (
+        db.query(Loan)
+        .join(Book, Loan.book_id == Book.id)
+        .filter(Loan.user_id == user_id, Loan.status != "returned")
+        .order_by(desc(Loan.loan_date))
+        .all()
+    )
+
+    # Construire la liste des objets de réponse
+    result = []
+    for loan in loans:
+        result.append(BorrowedBookResponse(
+            loan_id=loan.id,
+            book_id=loan.book.id,
+            title=loan.book.title,
+            author=loan.book.author,
+            description=loan.book.description,
+            isbn=loan.book.isbn,
+            published_year=loan.book.published_year,
+            category_id=loan.book.category_id,
+            cover_url=loan.book.cover_url,
+            loan_date=loan.loan_date,
+            due_date=loan.due_date,
+            return_date=loan.return_date,
+            status=loan.status,
+            book_quantity=loan.book.quantity
+        ))
+
+    return result

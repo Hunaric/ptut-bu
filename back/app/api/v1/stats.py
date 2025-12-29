@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func, extract
 from app.core.database import get_db
@@ -6,31 +6,13 @@ from app.models.book import Book
 from app.models.loan import Loan
 from datetime import date
 from app.crud.loan import get_user_loans
-from app.core.dependencies import require_admin, require_permission, require_superuser, get_current_user, require_any_permission
-
+from app.core.dependencies import (
+    require_admin, require_permission, require_superuser,
+    get_current_user, require_any_permission
+)
 
 router = APIRouter(prefix="/stats", tags=["Stats"])
 
-# @router.get("/dashboard/stats")
-# def get_dashboard_stats(db: Session = Depends(get_db)):
-
-#     loans_per_month = (
-#         db.query(
-#             extract('month', Loan.loan_date).label('month'),
-#             func.count(Loan.id).label('count')
-#         )
-#         .filter(Loan.loan_date >= date(2025, 1, 1))
-#         .group_by('month')
-#         .order_by('month')
-#         .all()
-#     )
-
-#     return {
-#         "loans_per_month": [
-#             {"month": int(m), "count": count}
-#             for m, count in loans_per_month
-#         ]
-#     }
 
 def loans_by_month(db: Session, year: int):
     results = (
@@ -43,62 +25,49 @@ def loans_by_month(db: Session, year: int):
         .order_by("month")
         .all()
     )
-
-    # tableau de 12 mois (index 0 = Janvier)
     data = [0] * 12
     for month, count in results:
         data[int(month) - 1] = count
-
     return data
 
+
 def on_time_return_rate_global(db: Session):
-    total_returns = db.query(func.count(Loan.id)) \
-        .filter(Loan.return_date.isnot(None)) \
-        .scalar()
-
-    if total_returns == 0:
+    """Taux global sur tous les prêts retournés"""
+    returned_loans = db.query(Loan).filter(Loan.return_date.isnot(None)).all()
+    if not returned_loans:
         return 0
+    on_time = sum(1 for loan in returned_loans if loan.return_date <= loan.due_date)
+    return round((on_time / len(returned_loans)) * 100, 2)
 
-    on_time = db.query(func.count(Loan.id)) \
-        .filter(
-            Loan.return_date.isnot(None),
-            Loan.return_date <= Loan.due_date
-        ).scalar()
-
-    return round((on_time / total_returns) * 100, 2)
 
 def on_time_return_rate_by_year(db: Session, year: int):
-    total_returns = db.query(func.count(Loan.id)) \
+    """Taux pour l'année, uniquement sur les prêts retournés cette année"""
+    returned_loans = db.query(Loan) \
         .filter(
             extract("year", Loan.loan_date) == year,
             Loan.return_date.isnot(None)
-        ).scalar()
-
-    if total_returns == 0:
+        ).all()
+    if not returned_loans:
         return 0
+    on_time = sum(1 for loan in returned_loans if loan.return_date <= loan.due_date)
+    return round((on_time / len(returned_loans)) * 100, 2)
 
-    on_time = db.query(func.count(Loan.id)) \
-        .filter(
-            extract("year", Loan.loan_date) == year,
-            Loan.return_date.isnot(None),
-            Loan.return_date <= Loan.due_date
-        ).scalar()
-
-    return round((on_time / total_returns) * 100, 2)
 
 def user_dashboard_stats(user_id: int, db: Session, year: int = date.today().year):
-    loans = [
-        loan for loan in get_user_loans(db, user_id)
-        if loan.loan_date.year == year
-    ]
+    all_loans = get_user_loans(db, user_id)
+    loans_this_year = [loan for loan in all_loans if loan.loan_date.year == year]
 
-    total_loans = len(loans)
+    returned_loans_global = [loan for loan in all_loans if loan.return_date]
+    total_returns_global = len(returned_loans_global)
+    on_time_returns_global = sum(1 for loan in returned_loans_global if loan.return_date <= loan.due_date)
+    on_time_rate_global = round((on_time_returns_global / total_returns_global) * 100, 2) if total_returns_global else 0
 
-    if total_loans == 0:
+    if not loans_this_year:
         return {
             "scope": "user",
             "loans_by_month": [0] * 12,
-            "on_time_return_rate": 0,
+            "late_by_month": [0] * 12,
+            "on_time_return_rate": on_time_rate_global,
             "metrics": {
                 "total_books": db.query(func.count(Book.id)).scalar(),
                 "total_loans": 0,
@@ -108,83 +77,92 @@ def user_dashboard_stats(user_id: int, db: Session, year: int = date.today().yea
             },
         }
 
-    # loans par mois
-    loans_by_month = [0] * 12
-    for loan in loans:
-        loans_by_month[loan.loan_date.month - 1] += 1
+    loans_by_month_list = [0] * 12
+    late_by_month_list = [0] * 12
+    active_loans = 0
+    late_loans = 0
 
-    on_time_returns = sum(
-        1 for loan in loans
-        if loan.return_date and loan.return_date <= loan.due_date
-    )
+    today = date.today()
+    for loan in loans_this_year:
+        month_idx = loan.loan_date.month - 1
+        loans_by_month_list[month_idx] += 1
 
-    active_loans = sum(1 for loan in loans if loan.return_date is None)
-    late_loans = sum(
-        1 for loan in loans
-        if loan.return_date is None and loan.due_date < date.today()
-    )
+        if loan.return_date is None:
+            if loan.due_date < today:
+                late_loans += 1
+                late_by_month_list[month_idx] += 1
+            else:
+                active_loans += 1
 
-    on_time_rate = round((on_time_returns / total_loans) * 100, 2)
+    returned_this_year = [loan for loan in loans_this_year if loan.return_date]
+    return_rate_year = round(
+        (sum(1 for loan in returned_this_year if loan.return_date <= loan.due_date) / len(returned_this_year)) * 100, 2
+    ) if returned_this_year else 0
 
     return {
         "scope": "user",
-        "loans_by_month": loans_by_month,
-        "on_time_return_rate": on_time_rate,
+        "loans_by_month": loans_by_month_list,
+        "late_by_month": late_by_month_list,
+        "on_time_return_rate": on_time_rate_global,
         "metrics": {
             "total_books": db.query(func.count(Book.id)).scalar(),
-            "total_loans": total_loans,
+            "total_loans": len(loans_this_year),
             "active_loans": active_loans,
             "late_loans": late_loans,
-            "return_rate": on_time_rate,
+            "return_rate": return_rate_year,
         },
     }
 
+
 def metrics(db: Session, year: int):
     today = date.today()
+    loans_this_year = db.query(Loan).filter(extract("year", Loan.loan_date) == year).all()
 
-    # Filtrer les loans sur l'année
-    total_loans = db.query(func.count(Loan.id)) \
-        .filter(extract("year", Loan.loan_date) == year) \
-        .scalar()
+    loans_by_month_list = [0] * 12
+    late_by_month_list = [0] * 12
+    active_loans = 0
+    late_loans = 0
 
-    active_loans = db.query(func.count(Loan.id)) \
-        .filter(
-            extract("year", Loan.loan_date) == year,
-            Loan.return_date.is_(None)
-        ).scalar()
+    for loan in loans_this_year:
+        month_idx = loan.loan_date.month - 1
+        loans_by_month_list[month_idx] += 1
 
-    late_loans = db.query(func.count(Loan.id)) \
-        .filter(
-            extract("year", Loan.loan_date) == year,
-            Loan.return_date.is_(None),
-            Loan.due_date < today
-        ).scalar()
+        if loan.return_date is None:
+            if loan.due_date < today:
+                late_loans += 1
+                late_by_month_list[month_idx] += 1
+            else:
+                active_loans += 1
+
+    returned_this_year = [loan for loan in loans_this_year if loan.return_date]
+    return_rate = round(
+        (sum(1 for loan in returned_this_year if loan.return_date <= loan.due_date) / len(returned_this_year)) * 100, 2
+    ) if returned_this_year else 0
 
     return {
-        "total_books": db.query(func.count(Book.id)).scalar(),  # livres totaux restent globaux
-        "total_loans": total_loans,
+        "total_books": db.query(func.count(Book.id)).scalar(),
+        "total_loans": len(loans_this_year),
         "active_loans": active_loans,
         "late_loans": late_loans,
-        "return_rate": on_time_return_rate_by_year(db, year)
+        "return_rate": return_rate,
+        "loans_by_month": loans_by_month_list,
+        "late_by_month": late_by_month_list,
     }
 
-@router.get(
-    "/dashboard",
-    dependencies=[Depends(require_any_permission("loan:manage", "loan:view_all"))]
-)
+
+@router.get("/dashboard", dependencies=[Depends(require_any_permission("loan:manage", "loan:view_all"))])
 def dashboard_stats(year: int = date.today().year, db: Session = Depends(get_db)):
     return {
         "scope": "global",
-        "loans_by_month": loans_by_month(db, year),
+        "metrics": metrics(db, year),
         "on_time_return_rate": on_time_return_rate_global(db),
-        "metrics": metrics(db, year)
     }
+
 
 @router.get("/user/{user_id}/loans", dependencies=[Depends(require_any_permission("loan:view_own", "loan:view_all"))])
 def user_loan_stats(user_id: int, db: Session = Depends(get_db)):
     loans = get_user_loans(db, user_id)
-    total_loans = len(loans)
-    if total_loans == 0:
+    if not loans:
         return {
             "total_loans": 0,
             "on_time_return_rate": 0,
@@ -197,19 +175,26 @@ def user_loan_stats(user_id: int, db: Session = Depends(get_db)):
             }
         }
 
-    on_time_returns = sum(1 for loan in loans if loan.return_date and loan.return_date <= loan.due_date)
+    returned_loans = [loan for loan in loans if loan.return_date]
+    on_time_returns = sum(1 for loan in returned_loans if loan.return_date <= loan.due_date)
+    total_returns = len(returned_loans)
+    on_time_rate = round((on_time_returns / total_returns) * 100, 2) if total_returns else 0
+
+    active_loans = sum(1 for loan in loans if loan.return_date is None)
+    late_loans = sum(1 for loan in loans if loan.return_date is None and loan.due_date < date.today())
 
     return {
-        "total_loans": total_loans,
-        "on_time_return_rate": round((on_time_returns / total_loans) * 100, 2),
+        "total_loans": len(loans),
+        "on_time_return_rate": on_time_rate,
         "metrics": {
             "total_books": db.query(func.count(Book.id)).scalar(),
-            "total_loans": total_loans,
-            "active_loans": sum(1 for loan in loans if loan.return_date is None),
-            "late_loans": sum(1 for loan in loans if loan.return_date is None and loan.due_date < date.today()),
-            "return_rate": round((on_time_returns / total_loans) * 100, 2)
+            "total_loans": len(loans),
+            "active_loans": active_loans,
+            "late_loans": late_loans,
+            "return_rate": on_time_rate,
         }
     }
+
 
 @router.get("/user/dashboard")
 def user_dashboard(

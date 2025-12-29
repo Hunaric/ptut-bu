@@ -37,7 +37,7 @@ export class CrudBookComponent {
   ngOnInit(): void {
     this.loadCategories();
     this.loadTags();
-    console.log(this.loadTags);
+    // console.log(this.loadTags);
     
 
     // Récupération de l'ID depuis l'URL

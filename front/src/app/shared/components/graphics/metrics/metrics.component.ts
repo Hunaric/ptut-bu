@@ -1,12 +1,14 @@
 import { Component, Input } from '@angular/core';
 import { SafeHtmlPipe } from '../../../pipe/safe-html.pipe';
 import { BadgeComponent } from '../../ui/badge/badge.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-metrics',
   imports: [
     SafeHtmlPipe,
-    BadgeComponent
+    BadgeComponent,
+    CommonModule
   ],
   templateUrl: './metrics.component.html',
   styleUrl: './metrics.component.css',

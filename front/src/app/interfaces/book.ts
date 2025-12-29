@@ -25,3 +25,20 @@ export interface BookFilter {
   category_ids?: number[];
   tag_ids?: number[];
 }
+
+export interface BorrowedBook {
+  loan_id: number;
+  book_id: number;
+  title: string;
+  author: string;
+  description: string;
+  isbn: string;
+  published_year: number;
+  category_id: number;
+  cover_url: string;
+  loan_date: string;
+  due_date: string;
+  return_date?: string;
+  status: string;
+  book_quantity?: number;
+}

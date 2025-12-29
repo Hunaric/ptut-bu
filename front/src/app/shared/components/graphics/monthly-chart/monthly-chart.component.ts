@@ -15,24 +15,25 @@ import { StatsService } from '../../../../services/stats.service';
 })
 export class MonthlyChartComponent implements OnChanges {
 
-  @Input() data?: number[] = [];
+  @Input() loansByMonth?: number[] = [];
+  @Input() lateByMonth?: number[] = [];
+
 
   constructor(private statsService: StatsService) {}
 
   ngOnChanges() {
-    this.series = [{ name: 'Emprunts', data: this.data ?? [] }];
+    this.series = [
+      { name: 'Emprunts', data: this.loansByMonth ?? [] },
+      { name: 'Retards', data: this.lateByMonth ?? [] },
+    ];
   }
   
-  public series: ApexAxisChartSeries = [
-    {
-      name: 'Emprunt',
-      data: [],
-    },
-  ];
+  public series: ApexAxisChartSeries = [];
   public chart: ApexChart = {
     fontFamily: 'Outfit, sans-serif',
     type: 'bar',
     height: 180,
+  stacked: false,
     toolbar: { show: false },
   };
   public xaxis: ApexXAxis = {
@@ -70,7 +71,7 @@ export class MonthlyChartComponent implements OnChanges {
     x: { show: false },
     y: { formatter: (val: number) => `${val}` },
   };
-  public colors: string[] = ['#465fff'];
+  public colors: string[] = ['#465fff', '#ff4d6d']; // Emprunts = bleu, Retards = rouge
 
 
   isOpen = false;

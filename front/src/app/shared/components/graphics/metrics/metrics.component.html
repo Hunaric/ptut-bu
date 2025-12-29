@@ -27,7 +27,7 @@
       </div>
       <app-badge [color]="metrics!.active_loans > 0 ? 'warning' : 'success'">
         <span [innerHTML]="icons.arrowUpIcon | safeHtml"></span>
-        Active: {{ metrics?.active_loans }}
+        Prêts en cours: {{ metrics?.active_loans }}
       </app-badge>
     </div>
   </div>
@@ -41,9 +41,9 @@
         <span class="text-sm text-gray-500 dark:text-gray-400">Retard observe en {{year}}</span>
         <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{{ metrics!.late_loans }}</h4>
       </div>
-      <app-badge [color]="metrics!.late_loans > 0 ? 'error' : 'success'">
+      <app-badge [color]="metrics!.late_loans > 3 ? 'error' : 'success'">
         <!-- <span [innerHTML]="icons.exclamationIcon | safeHtml"></span> -->
-        {{ metrics!.late_loans > 0 ? '⚠' : '✔' }}
+        {{ metrics!.late_loans > 3 ? '⚠' : '✔' }}
       </app-badge>
     </div>
   </div>
@@ -55,11 +55,14 @@
     <div class="flex items-end justify-between mt-5">
       <div>
         <span class="text-sm text-gray-500 dark:text-gray-400">Retour de livres ponctuel pour {{year}}</span>
-        <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{{ metrics?.return_rate }}%</h4>
+        <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{{ (((metrics?.total_loans ?? 0) - ((metrics?.late_loans ?? 0) + (metrics?.active_loans ?? 0) )) / (metrics?.total_loans ?? 1) * 100) | number:'1.2-2' }}%</h4>
       </div>
       <app-badge color="success">
+        
         <span [innerHTML]="icons.arrowUpIcon | safeHtml"></span>
-        {{ metrics?.return_rate }}%
+{{ ((metrics?.total_loans ?? 0) - ((metrics?.late_loans ?? 0) + (metrics?.active_loans ?? 0) )) }}/{{ metrics?.total_loans ?? 0 }} 
+<!-- ({{ (((metrics?.total_loans ?? 0) - ((metrics?.late_loans ?? 0) + (metrics?.active_loans ?? 0) )) / (metrics?.total_loans ?? 1) * 100) | number:'1.0-0' }}%) -->
+
       </app-badge>
     </div>
   </div>
