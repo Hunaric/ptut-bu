@@ -12,6 +12,7 @@ import { DetailBookComponent } from './pages/detail-book/detail-book.component';
 import { MyLoansComponent } from './pages/my-loans/my-loans.component';
 import { UserPermissionComponent } from './pages/user-permission/user-permission.component';
 import { LoanListComponent } from './pages/loan-list/loan-list.component';
+import { RecommandationComponent } from './pages/recommandation/recommandation.component';
 
 export const routes: Routes = [
     // Page d'accueil
@@ -56,6 +57,11 @@ export const routes: Routes = [
                 path:'my-loans',
                 component:MyLoansComponent,
                 title:'Mes emprunts'
+            },
+            {
+                path:'recommandation',
+                component:RecommandationComponent,
+                title:'Mes recommandations'
             },
             
             {

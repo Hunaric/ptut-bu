@@ -1,0 +1,15 @@
+<app-page-breadcrumb pageTitle="Recommandation"></app-page-breadcrumb>
+
+<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4 justify-items-center w-full">
+  <div *ngFor="let book of books;" class="flex justify-center w-full">
+    <app-card
+      class="mx-auto max-w-sm"
+      [title]="book.title"
+      [desc]="book.description"
+      [bookId]="book.id"
+
+    >
+      <app-book-item [imageUrl]="book.cover_url"></app-book-item>
+    </app-card>
+  </div>
+</div>

@@ -191,4 +191,13 @@ async getTags(): Promise<Tag[]> {
   return firstValueFrom(this.http.get<Tag[]>(`${environment.apiUrl}/tags`, { headers: this.getAuthHeaders() }));
 }
 
+getUserRecommendations() {
+  return firstValueFrom(
+    this.http.get<Book[]>(`${environment.apiUrl}/recommandation/user`, {
+      withCredentials: true
+    })
+  );
+
+}
+
 }

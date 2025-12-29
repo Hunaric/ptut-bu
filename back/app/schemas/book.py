@@ -15,6 +15,20 @@ class BookBase(BaseModel):
     quantity: Optional[int] = 1
     cover_url: Optional[str] = None
 
+class RecommendedBook(BaseModel):
+    id: int
+    title: str
+    author: Optional[str] = None
+    description: Optional[str] = None
+    isbn: Optional[str] = None
+    published_year: Optional[int] = None
+    category_id: Optional[int] = None
+    quantity: Optional[int] = 1
+    cover_url: Optional[str] = None
+
+    model_config = {
+        "from_attributes": True
+    }
 
 # =========================
 # Création
