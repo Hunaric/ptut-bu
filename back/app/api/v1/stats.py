@@ -114,26 +114,18 @@ def user_dashboard_stats(user_id: int, db: Session, year: int = date.today().yea
     }
 
 
+# Admin methods
+
 def metrics(db: Session, year: int):
     today = date.today()
+
+    # Loans pour l'année
     loans_this_year = db.query(Loan).filter(extract("year", Loan.loan_date) == year).all()
 
-    loans_by_month_list = [0] * 12
-    late_by_month_list = [0] * 12
-    active_loans = 0
-    late_loans = 0
+    active_loans = sum(1 for loan in loans_this_year if loan.return_date is None)
+    late_loans = sum(1 for loan in loans_this_year if loan.return_date is None and loan.due_date < today)
 
-    for loan in loans_this_year:
-        month_idx = loan.loan_date.month - 1
-        loans_by_month_list[month_idx] += 1
-
-        if loan.return_date is None:
-            if loan.due_date < today:
-                late_loans += 1
-                late_by_month_list[month_idx] += 1
-            else:
-                active_loans += 1
-
+    # Return rate = uniquement sur les prêts rendus cette année
     returned_this_year = [loan for loan in loans_this_year if loan.return_date]
     return_rate = round(
         (sum(1 for loan in returned_this_year if loan.return_date <= loan.due_date) / len(returned_this_year)) * 100, 2
@@ -145,17 +137,39 @@ def metrics(db: Session, year: int):
         "active_loans": active_loans,
         "late_loans": late_loans,
         "return_rate": return_rate,
-        "loans_by_month": loans_by_month_list,
-        "late_by_month": late_by_month_list,
     }
 
+def late_by_month(db: Session, year: int):
+    """Retourne le nombre de prêts en retard par mois pour l'année donnée"""
+    today = date.today()
+    results = (
+        db.query(
+            extract("month", Loan.loan_date).label("month"),
+            func.count(Loan.id)
+        )
+        .filter(
+            extract("year", Loan.loan_date) == year,
+            Loan.return_date.is_(None),       # Non encore retourné
+            Loan.due_date < today             # Dépassé
+        )
+        .group_by("month")
+        .order_by("month")
+        .all()
+    )
+
+    data = [0] * 12
+    for month, count in results:
+        data[int(month) - 1] = count
+    return data
 
 @router.get("/dashboard", dependencies=[Depends(require_any_permission("loan:manage", "loan:view_all"))])
 def dashboard_stats(year: int = date.today().year, db: Session = Depends(get_db)):
     return {
         "scope": "global",
-        "metrics": metrics(db, year),
+        "loans_by_month": loans_by_month(db, year),
+        "late_by_month": late_by_month(db, year),
         "on_time_return_rate": on_time_return_rate_global(db),
+        "metrics": metrics(db, year),
     }
 
 
