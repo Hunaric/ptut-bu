@@ -141,6 +141,7 @@ async createBook(book: Partial<Book>): Promise<Book> {
    */
   async updateBook(id: number, book: Partial<Book>): Promise<Book> {
     const url = `${this.apiUrl}/${id}`;
+      console.log('yes');
 
     try {
       const data = await firstValueFrom(
@@ -148,8 +149,11 @@ async createBook(book: Partial<Book>): Promise<Book> {
           headers: this.getAuthHeaders(),
         })
       );
+      
+      console.log('data:', data);
       return data;
     } catch (error) {
+      console.log('No');
       console.error(`Erreur lors de la mise à jour du livre ${id}`, error);
       throw error;
     }

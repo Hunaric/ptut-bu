@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
-from sqlalchemy import or_
+from sqlalchemy import or_, desc
 from typing import List
 from app.models.book import Book
 from app.models.tag import Tag
@@ -80,6 +80,8 @@ def update_book(db: Session, book_id: int, book_data: BookUpdate):
 def get_books(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Book).offset(skip).limit(limit).all()
 
+from sqlalchemy import asc
+
 def get_books_advanced(
     db: Session,
     page: int = 1,
@@ -95,10 +97,13 @@ def get_books_advanced(
     if tag_ids:
         query = (
             query.join(Book.tags)
-            .filter(Tag.id.in_(tag_ids))
-            .group_by(Book.id)
-            .having(func.count(Tag.id) == len(tag_ids))
+                 .filter(Tag.id.in_(tag_ids))
+                 .group_by(Book.id)
+                 .having(func.count(Tag.id) == len(tag_ids))
         )
+
+    # Trier par titre (ordre alphabétique croissant)
+    query = query.order_by(asc(Book.title))
 
     total = query.count()
 

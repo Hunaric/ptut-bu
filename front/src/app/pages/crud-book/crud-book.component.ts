@@ -45,6 +45,7 @@ export class CrudBookComponent {
         const id = params.get('id');
         if (id) {
             this.bookId = +id;
+            
             this.loadBook(); // charger les données pour édition
         }
     });
@@ -115,6 +116,7 @@ onTagChange(event: Event) {
 
     try {
       if (this.bookId) {
+        
   await this.bookService.updateBook(this.bookId, payload);
 } else {
   await this.bookService.createBook(payload);

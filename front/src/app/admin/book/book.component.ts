@@ -50,6 +50,20 @@ async loadBooks(): Promise<void> {
     this.loading = false;
   }
 }
+goToPage(value: string | number) {
+  let pageNumber = Number(value);
+
+  // Valider la valeur
+  if (isNaN(pageNumber) || pageNumber < 1) {
+    pageNumber = 1;
+  } else if (pageNumber > this.totalPages) {
+    pageNumber = this.totalPages;
+  }
+
+  this.page = pageNumber;
+  this.loadBooks();
+}
+
 
 
   nextPage() {
