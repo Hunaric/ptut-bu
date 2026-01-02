@@ -97,3 +97,8 @@ système RBAC (Role-Based Access Control)
 Pour changer la bd
 'docker exec -it ptut_back alembic revision --autogenerate -m "Apply Account model"'
 'docker exec -it ptut_back alembic stamp head'
+
+Commande pour exporter la bd:
+`docker exec -t ptut_db pg_dump -U ptut_user ptut_db > backup.sql`
+import:
+`docker exec -i ptut_db psql -U ptut_user ptut_db < backup.sql`
