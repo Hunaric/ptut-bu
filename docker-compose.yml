@@ -40,6 +40,7 @@ services:
       - "5433:5432"  # <-- port modifié pour éviter conflit
     volumes:
       - db_data:/var/lib/postgresql/data
+      - ./backup.sql:/docker-entrypoint-initdb.d/backup.sql
 
   pgadmin:
     image: dpage/pgadmin4:7
