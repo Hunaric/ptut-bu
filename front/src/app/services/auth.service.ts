@@ -36,6 +36,31 @@ export class AuthService {
   notifySessionExpired(): void {
     this.logout();
   }
+
+  async signup(formData: any): Promise<any> {
+  const url = `${this.apiUrl}/auth/register`;
+  const options = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(formData)
+  };
+
+  try {
+    const response = await fetch(url, options);
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('Erreur API inscription:', data);
+      return { success: false, detail: data.detail || 'Erreur serveur' };
+    }
+
+    return { success: true, ...data };
+  } catch (error) {
+    console.error('Erreur fetch inscription:', error);
+    return { success: false, detail: 'Erreur réseau ou serveur' };
+  }
+}
+
   
   async onLogedIn(identifier: string, password: string): Promise<any> {
     const url = `${this.apiUrl}/auth/login`;
