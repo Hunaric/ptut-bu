@@ -3,10 +3,11 @@ import { LoanService } from '../../services/loan.service';
 import { Loan, LoanList } from '../../interfaces/loan'; // <-- utilise Loan, pas LoanCalendar
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ModalComponent } from '../../shared/components/ui/modal/modal.component';
 
 @Component({
   selector: 'app-loan-list',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ModalComponent],
   templateUrl: './loan-list.component.html',
   styleUrls: ['./loan-list.component.css']
 })
@@ -15,6 +16,20 @@ export class LoanListComponent implements OnInit {
   loans: LoanList[] = [];
   loading = false;
   error: string | null = null;
+
+  
+  showModal = false;         // <-- modal ouvert ou non
+  modalMessage = '';         // <-- message à afficher dans le modal
+
+  openModal(message: string) {
+  this.modalMessage = message;
+  this.showModal = true;
+}
+
+closeModal() {
+  this.showModal = false;
+  this.modalMessage = '';
+}
 
 
 page = 1;
@@ -63,24 +78,32 @@ get totalPages(): number {
   return Math.ceil(this.total / this.pageSize) || 1;
 }
 
+async markAsReturned(loan: LoanList) {
+  try {
+    const updatedLoan = await this.loanService.updateLoanStatus(loan.id, 'returned');
+    Object.assign(loan, updatedLoan);
+  } catch (err) {
+    console.error('Impossible de mettre à jour le statut', err);
+  }
+}
 
-  async markAsReturned(loan: LoanList) {
-    try {
-      await this.loanService.updateLoanStatus(loan.id, 'returned'); // conforme à la signature du service
-      loan.status = 'returned';
-    } catch (err) {
-      console.error('Impossible de mettre à jour le statut', err);
+
+async approveLoan(loan: LoanList) {
+  try {
+    const updatedLoan = await this.loanService.updateLoanStatus(loan.id, 'approved');
+    Object.assign(loan, updatedLoan);
+  } catch (err: any) {
+    console.error('Impossible de valider le prêt', err);
+
+    // Vérifie si c'est une erreur HTTP 400
+    if (err?.status === 400) {
+      this.openModal('Livre indisponible.');
+    } else {
+      this.openModal('Une erreur est survenue lors de l’approbation du prêt.');
     }
   }
+}
 
-  async approveLoan(loan: LoanList) {
-    try {
-      await this.loanService.updateLoanStatus(loan.id, 'approved');
-      loan.status = 'approved';
-    } catch (err) {
-      console.error('Impossible de valider le prêt', err);
-    }
-  }
 
 statusLabels: Record<string, string> = {
   requested: 'Demandé',

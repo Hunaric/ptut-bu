@@ -102,3 +102,21 @@ Commande pour exporter la bd:
 `docker exec -t ptut_db pg_dump -U ptut_user ptut_db > backup.sql`
 import:
 `docker exec -i ptut_db psql -U ptut_user ptut_db < backup.sql`
+`Get-Content backup.sql | docker exec -i ptut_db psql -U ptut_user ptut_db`
+
+
+Faire:
+`
+docker exec -it ptut_db psql -U ptut_user -d postgres -c "
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE datname = 'ptut_db'
+AND pid <> pg_backend_pid();
+"
+`
+puis
+`docker exec -it ptut_db psql -U ptut_user -d postgres -c "DROP DATABASE ptut_db;"`
+et
+docker exec -it ptut_db psql -U ptut_user -d postgres -c "CREATE DATABASE ptut_db;"
+enfin
+Get-Content backup.sql | docker exec -i ptut_db psql -U ptut_user ptut_db

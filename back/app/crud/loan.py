@@ -123,13 +123,30 @@ def update_loan_status(db: Session, loan_id: int, new_status: LoanStatus):
     if not book:
         raise HTTPException(404, "Book not found")
 
-    # logique selon le nouveau status
+    # Vérifier transitions valides
+    valid_transitions = {
+        "requested": ["approved", "rejected"],
+        "approved": ["ongoing", "returned"],
+        "ongoing": ["returned", "late"],
+        "late": ["returned"],
+        "returned": []
+    }
+
+    if new_status not in valid_transitions.get(loan.status, []):
+        raise HTTPException(
+            400,
+            f"Cannot change loan status from '{loan.status}' to '{new_status}'"
+        )
+
+    # Approuver le prêt
     if new_status == LoanStatus.approved:
         if book.quantity <= 0:
             raise HTTPException(400, "No copies available for this book")
         book.quantity -= 1
         loan.loan_date = date.today()
         loan.due_date = date.today() + timedelta(days=14)
+
+    # Retourner le prêt
     elif new_status in [LoanStatus.returned, LoanStatus.late]:
         book.quantity += 1
         loan.return_date = date.today()

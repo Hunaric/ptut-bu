@@ -58,4 +58,14 @@
     (click)="changePage(page + 1)">
     Suivant
   </button>
+
+  <app-modal 
+  [isOpen]="showModal" 
+  (close)="closeModal()"
+  [className]="'max-w-lg p-4'"
+>
+  <p>{{ modalMessage }}</p>
+  <button (click)="closeModal()" class="btn btn-primary mt-4">Fermer</button>
+</app-modal>
+
 </div>

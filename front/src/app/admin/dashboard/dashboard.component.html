@@ -1,6 +1,6 @@
 <div class="flex items-center gap-2 mb-4">
-  <label for="year-select">Année:</label>
-  <select id="year-select" [(ngModel)]="selectedYear" (change)="onYearChange()">
+  <label class="text-lg font-semibold text-gray-800 dark:text-white/90" for="year-select">Année:</label>
+  <select class="text-lg text-gray-800 dark:text-white/90" id="year-select" [(ngModel)]="selectedYear" (change)="onYearChange()">
     <option *ngFor="let y of years" [value]="y">{{ y }}</option>
   </select>
 </div>
