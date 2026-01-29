@@ -13,6 +13,7 @@ import { MyLoansComponent } from './pages/my-loans/my-loans.component';
 import { UserPermissionComponent } from './pages/user-permission/user-permission.component';
 import { LoanListComponent } from './pages/loan-list/loan-list.component';
 import { RecommandationComponent } from './pages/recommandation/recommandation.component';
+import { UserComponent } from './settings/user/user.component';
 
 export const routes: Routes = [
     // Page d'accueil
@@ -74,6 +75,12 @@ export const routes: Routes = [
                 path:'loan-list',
                 component:LoanListComponent,
                 title:'Liste des prêts'
+            },
+            
+            {
+                path:'settings',
+                component:UserComponent,
+                title:'Paramètres utilisateur'
             },
             
         ],

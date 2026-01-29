@@ -38,7 +38,7 @@ def list_users(
 
 # UPDATE User + Account
 @router.put("/{user_id}", response_model=User)
-def update_user_info(user_id: int, updates: UserUpdate, db: Session = Depends(get_db)):
+def update_user_info(user_id: str, updates: UserUpdate, db: Session = Depends(get_db)):
     db_user = get_user(db, user_id)
     if not db_user:
         raise HTTPException(404, "User not found")
@@ -47,7 +47,7 @@ def update_user_info(user_id: int, updates: UserUpdate, db: Session = Depends(ge
 
 # UPDATE Account linked to User
 @router.put("/{user_id}/account", response_model=User) 
-def update_account_info(user_id: int, updates: AccountUpdate, db: Session = Depends(get_db)):
+def update_account_info(user_id: str, updates: AccountUpdate, db: Session = Depends(get_db)):
     db_user = get_user(db, user_id)
     if not db_user:
         raise HTTPException(404, "User not found")

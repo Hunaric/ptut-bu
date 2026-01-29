@@ -1,0 +1,100 @@
+<div class="w-full max-w-4xl mx-auto p-6 bg-white rounded shadow-md">
+
+  <h2 class="text-2xl font-semibold mb-6">Mon profil</h2>
+
+  <!-- Messages -->
+  <div *ngIf="errorMsg" class="mb-4 p-3 bg-red-100 text-red-700 rounded">{{ errorMsg }}</div>
+  <div *ngIf="successMsg" class="mb-4 p-3 bg-green-100 text-green-700 rounded">{{ successMsg }}</div>
+
+  <!-- User Form -->
+  <form [formGroup]="userForm" (ngSubmit)="saveUser()" class="mb-8">
+
+    <h3 class="text-xl font-semibold mb-4">Informations utilisateur</h3>
+
+    <!-- Email -->
+    <div class="mb-4">
+      <label class="block mb-1 font-medium">Email</label>
+      <input type="email" formControlName="email" placeholder="Email"
+             class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      <div *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" class="text-red-500 text-sm">
+        L'email est requis
+      </div>
+    </div>
+
+    <!-- Username -->
+    <div class="mb-4">
+      <label class="block mb-1 font-medium">Username</label>
+      <input type="text" formControlName="username" placeholder="Nom d'utilisateur"
+             class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+    </div>
+
+    <button type="submit" [disabled]="loading"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition">
+      Enregistrer utilisateur
+    </button>
+  </form>
+
+  <hr class="my-6 border-gray-300"/>
+
+  <!-- Account Form -->
+  <form [formGroup]="accountForm" (ngSubmit)="saveAccount()">
+
+    <h3 class="text-xl font-semibold mb-4">Informations compte</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Nom -->
+      <div>
+        <label class="block mb-1 font-medium">Nom</label>
+        <input type="text" formControlName="nom" placeholder="Nom"
+               class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+
+      <!-- Prénom -->
+      <div>
+        <label class="block mb-1 font-medium">Prénom</label>
+        <input type="text" formControlName="prenom" placeholder="Prénom"
+               class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+
+      <!-- Sexe -->
+      <div>
+        <label class="block mb-1 font-medium">Sexe</label>
+        <input type="text" formControlName="sexe" placeholder="Sexe"
+               class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+
+      <!-- Téléphone -->
+      <div>
+        <label class="block mb-1 font-medium">Téléphone</label>
+        <input type="text" formControlName="telephone" placeholder="Téléphone"
+               class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+
+      <!-- Pays -->
+      <div>
+        <label class="block mb-1 font-medium">Pays</label>
+        <input type="text" formControlName="pays" placeholder="Pays"
+               class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+
+      <!-- Ville -->
+      <div>
+        <label class="block mb-1 font-medium">Ville</label>
+        <input type="text" formControlName="ville" placeholder="Ville"
+               class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+
+      <!-- Rue -->
+      <div>
+        <label class="block mb-1 font-medium">Rue</label>
+        <input type="text" formControlName="rue" placeholder="Rue"
+               class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="loading"
+            class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition">
+      Enregistrer compte
+    </button>
+  </form>
+</div>

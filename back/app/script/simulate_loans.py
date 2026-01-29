@@ -12,7 +12,7 @@ from app.models.role import Role
 # PARAMÈTRES
 # =========================
 START_YEAR = 2020
-END_YEAR = 2025
+END_YEAR = 2026
 
 NB_BORROWERS = 20
 NB_STAFF = 5
@@ -44,14 +44,14 @@ def main():
     db: Session = SessionLocal()
 
     try:
-        print("📚 Chargement des données...")
+        print("Chargement des données...")
 
         borrowers = db.query(User).join(Role).filter(Role.name.in_(["Student", "Teacher"])).limit(NB_BORROWERS).all()
         staff_members = db.query(User).join(Role).filter(Role.name.in_(["Librarian", "Admin"])).limit(NB_STAFF).all()
         books = db.query(Book).all()
 
         if not borrowers or not staff_members or not books:
-            raise RuntimeError("❌ Données insuffisantes pour la simulation")
+            raise RuntimeError("Alerte: Données insuffisantes pour la simulation")
 
         print(f"👤 Borrowers utilisés : {len(borrowers)}")
         print(f"🧑‍💼 Staff utilisés : {len(staff_members)}")
@@ -123,7 +123,7 @@ def main():
         db.commit()
 
         print("✅ Simulation terminée")
-        print(f"📊 Emprunts créés : {total_loans}")
+        print(f"Emprunts créés : {total_loans}")
         print(f"📅 Période : {START_YEAR} → {END_YEAR}")
 
     except Exception as e:

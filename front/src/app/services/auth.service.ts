@@ -5,7 +5,7 @@ import { firstValueFrom, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MyPermissions } from '../interfaces/permission';
-import { Me } from '../interfaces/user';
+import { Me, User } from '../interfaces/user';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -87,6 +87,21 @@ export class AuthService {
     }
   }
   
+  async getMe2(): Promise<Me> {
+  const token = localStorage.getItem('access_token');
+  if (!token) throw new Error('No access token');
+
+  const res = await fetch(`${this.apiUrl}/auth/me`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json'
+    }
+  });
+
+  if (!res.ok) throw new Error('Impossible de récupérer les infos utilisateur');
+  return res.json();
+}
+
 
 async getMe(): Promise<Me> {
   const token = localStorage.getItem('access_token');
@@ -102,5 +117,19 @@ async getMe(): Promise<Me> {
   if (!res.ok) throw new Error('Impossible de récupérer les infos utilisateur');
   return res.json();
 }
+
+  private get headers() {
+    const token = localStorage.getItem('access_token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+  }
+  
+  getUserByIdentifier(identifier: string): Promise<User> {
+    return firstValueFrom(
+      this.http.get<User>(`${this.apiUrl}/users/by-identifier/${identifier}`, { headers: this.headers })
+    );
+  }
 
 }
