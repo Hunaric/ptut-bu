@@ -8,6 +8,7 @@ import { PageBreadcrumbComponent } from '../../components/common/page-breadcrumb
 import { LoanService } from '../../services/loan.service';
 import { Loan } from '../../interfaces/loan';
 import { ModalComponent } from '../../shared/components/ui/modal/modal.component';
+import { Category } from '../../interfaces/category';
 
 @Component({
   selector: 'app-detail-book',
@@ -21,6 +22,8 @@ export class DetailBookComponent implements OnInit{
   permissions: string[] = [];
   
   book?: Book;
+  category?: Category;
+
   loading = true;
   error = '';
 
@@ -49,6 +52,16 @@ export class DetailBookComponent implements OnInit{
 
     try {
       this.book = await this.bookService.getBookById(id);
+      
+      console.log(this.book);
+      
+  if (this.book?.category_id) {
+    this.category = await this.bookService.getCategoryById(
+      this.book.category_id
+    );
+    console.log(this.category);
+  }
+      
     } catch {
       this.error = 'Livre introuvable';
     } finally {

@@ -21,6 +21,13 @@ def create_category(db: Session, category: CategoryBase):
     db.refresh(db_category)
     return db_category
 
+def get_category(db: Session, category_id: int):
+    category = db.query(Category).filter(Category.id == category_id).first()
+
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    return category
+
 def delete_category(db: Session, category_id: int):
     category = db.query(Category).filter(Category.id == category_id).first()
 

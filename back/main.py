@@ -24,6 +24,7 @@ app = FastAPI(title="Bibliotheque Universitaire")
 origins = [
     "http://localhost:4300",  # Angular dev server
     "http://localhost:4200",  # si utilisé
+    "http://localhost:4500",  # si utilisé
     "http://127.0.0.1:4300",
 ]
 

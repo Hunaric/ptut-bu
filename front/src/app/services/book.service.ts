@@ -187,6 +187,14 @@ async createBook(book: Partial<Book>): Promise<Book> {
   return firstValueFrom(this.http.get<Category[]>(`${environment.apiUrl}/categories`, { headers: this.getAuthHeaders() }));
 }
 
+  async getCategoryById(categoryId: number): Promise<Category> {
+    return firstValueFrom(
+      this.http.get<Category>(
+        `${environment.apiUrl}/categories/${categoryId}`,
+        { headers: this.getAuthHeaders() }
+      )
+    );
+  }
 async getTags(): Promise<Tag[]> {
   return firstValueFrom(this.http.get<Tag[]>(`${environment.apiUrl}/tags`, { headers: this.getAuthHeaders() }));
 }

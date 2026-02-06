@@ -20,6 +20,10 @@ def add_category(category: CategoryBase, db: Session = Depends(get_db),
 ):
     return crud.create_category(db, category)
 
+@router.get("/{category_id}", response_model=Category)
+def get_category(category_id: int, db: Session = Depends(get_db)):
+    return crud.get_category(db, category_id)
+
 # Accessible uniquement aux superusers
 @router.delete("/{category_id}")
 def delete_category(

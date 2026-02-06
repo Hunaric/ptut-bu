@@ -38,7 +38,10 @@
         <p><span class="font-medium">ISBN :</span> {{ book.isbn || '—' }}</p>
         <p><span class="font-medium">Année :</span> {{ book.published_year || '—' }}</p>
         <p><span class="font-medium">Quantité :</span> {{ book.quantity }}</p>
-        <p><span class="font-medium">Catégorie :</span> {{ book.category?.name || '—' }}</p>
+        <p *ngIf="category">
+          <strong>Catégorie :</strong> {{ category.name }}
+        </p>
+
       </div>
 
       <!-- Tags -->

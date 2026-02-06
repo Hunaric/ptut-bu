@@ -3,6 +3,10 @@
 import { Category } from "./category";
 import { Tag } from "./tag";
 
+export interface BookCategoryLink {
+  category_id: number;
+}
+
 export interface Book {
   id: number;
   title: string;
@@ -13,7 +17,7 @@ export interface Book {
   quantity: number;
   cover_url?: string;
 
-  category?: Category;
+  category_id?: number;
   tag?: Tag[];
 }
 

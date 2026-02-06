@@ -77,7 +77,7 @@ export class CrudBookComponent {
         description: book.description,
         isbn: book.isbn,
         published_year: book.published_year,
-        category_id: book.category?.id,
+        category_id: book.category_id,
         quantity: book.quantity,
         tags: book.tag?.map(t => t.id) || []
       });
