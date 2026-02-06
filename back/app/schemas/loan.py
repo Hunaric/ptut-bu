@@ -71,16 +71,19 @@ class BorrowedBookResponse(BaseModel):
     book_id: int
     title: str
     author: str
-    description: str
+
+    description: Optional[str] = None
     isbn: str
-    published_year: int
-    category_id: int
-    cover_url: str
-    loan_date: date
-    due_date: date
-    return_date: date | None
+    published_year: Optional[int] = None
+    category_id: Optional[int] = None
+    cover_url: Optional[str] = None
+
+    loan_date: Optional[date] = None
+    due_date: Optional[date] = None
+    return_date: Optional[date] = None
+
     status: str
-    book_quantity: int
+    book_quantity: Optional[int] = None
 
     model_config = {
         "from_attributes": True
