@@ -187,7 +187,7 @@ export class AppSidebarComponent {
         { name: "Tableau de bord", path: "/" },
       ...(this.permissions.includes("loan:manage")
         ? [{ name: "Creer un livre", path: "/crud-books", pro: true }]
-        : [{ name: "Mes recommandations", path: "/recommendation", pro: false }]),
+        : [{ name: "Mes recommandations", path: "/recommandation", pro: false }]),
       ]
     },
     {
