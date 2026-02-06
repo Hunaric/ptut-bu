@@ -203,8 +203,9 @@ export class AppSidebarComponent {
         { name: "Livres", path: "/books", pro: false },
         ...(this.permissions.includes("loan:manage")
         ? [{ name: "Assigner permission", path: "/permission", pro: true }]
-        : [{ name: "Emprunts", path: "/my-loans", pro: false }, { name: "Recommandations", path: "/recommandation", pro: false }]),
-        ...(this.permissions.includes("loan:manage") || this.permissions.includes("loan:view")
+        : [{ name: "Emprunts", path: "/my-loans", pro: false }, 
+          { name: "Recommandations", path: "/recommandation", pro: false }]),
+        ...(this.permissions.includes("loan:manage") || this.permissions.includes("loan:view") || this.permissions.includes("loan:view_all")
         ? [{ name: "Voir emprunts", path: "/loan-list", pro: true }]
         : []),
       ],
