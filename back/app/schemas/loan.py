@@ -70,7 +70,7 @@ class BorrowedBookResponse(BaseModel):
     loan_id: int
     book_id: int
     title: str
-    author: str
+    author: Optional[str] = None
 
     description: Optional[str] = None
     isbn: str
